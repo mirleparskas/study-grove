@@ -975,9 +975,9 @@ const AHAD_HARD_ROWS=[
   ],
   "reasons": [
    "This is the usual major pediatric AOM trio, not an exhaustive list of every possible cause.",
-   "This substitutes S. aureus for nontypeable H. influenzae.",
+   "This substitutes Staphylococcus aureus for nontypeable Haemophilus influenzae.",
    "The external-canal pair is substituted for the usual AOM set.",
-   "This substitutes GAS for pneumococcus and type b for nontypeable H. influenzae."
+   "This substitutes GAS for pneumococcus and type b for nontypeable Haemophilus influenzae."
   ],
   "extra": [
    "aomOrganismsCPS"
@@ -997,7 +997,7 @@ const AHAD_HARD_ROWS=[
    "Pasteurella multocida; Streptococcus pyogenes"
   ],
   "reasons": [
-   "Pseudomonas/S. aureus are the usual important OE pair.",
+   "Pseudomonas/Staphylococcus aureus are the usual important OE pair.",
    "These are middle-ear/respiratory-associated organisms rather than the usual OE pair.",
    "This also favors the middle-ear pathogen set.",
    "Pasteurella is an animal-bite clue, not the usual external-canal pair."
@@ -1014,15 +1014,15 @@ const AHAD_HARD_ROWS=[
   "skill": "organism",
   "prompt": "A child has superficial honey-crusted nonbullous lesions. Which set matches the usual causes, and the organism linked to the bullous form?",
   "options": [
-   "Nonbullous: Staphylococcus aureus and/or Streptococcus pyogenes; bullous: toxin-producing S. aureus",
-   "Nonbullous: S. aureus and/or S. pyogenes; bullous: toxin-producing S. pyogenes",
-   "Nonbullous: S. pneumoniae and/or S. pyogenes; bullous: toxin-producing S. aureus",
-   "Nonbullous: S. aureus and/or S. agalactiae; bullous: toxin-producing S. agalactiae"
+   "Nonbullous: Staphylococcus aureus and/or Streptococcus pyogenes; bullous: toxin-producing Staphylococcus aureus",
+   "Nonbullous: Staphylococcus aureus and/or Streptococcus pyogenes; bullous: toxin-producing Streptococcus pyogenes",
+   "Nonbullous: Streptococcus pneumoniae and/or Streptococcus pyogenes; bullous: toxin-producing Staphylococcus aureus",
+   "Nonbullous: Staphylococcus aureus and/or Streptococcus agalactiae; bullous: toxin-producing Streptococcus agalactiae"
   ],
   "reasons": [
-   "Nonbullous impetigo can involve S. aureus/GAS; bullous disease is associated with toxin-producing S. aureus.",
+   "Nonbullous impetigo can involve Staphylococcus aureus/GAS; bullous disease is associated with toxin-producing Staphylococcus aureus.",
    "The nonbullous pair fits but the bullous organism is incorrect.",
-   "Pneumococcus incorrectly replaces S. aureus in the usual nonbullous set.",
+   "Pneumococcus incorrectly replaces Staphylococcus aureus in the usual nonbullous set.",
    "GBS is substituted for GAS, and the bullous assignment is wrong."
   ],
   "extra": [
@@ -1043,7 +1043,7 @@ const AHAD_HARD_ROWS=[
    "Pasteurella multocida; Staphylococcus aureus; Moraxella catarrhalis"
   ],
   "reasons": [
-   "Pneumococcus, H. influenzae and M. catarrhalis are the usual targets in this uncomplicated syndrome.",
+   "Pneumococcus, Haemophilus influenzae and M. catarrhalis are the usual targets in this uncomplicated syndrome.",
    "This substitutes organisms that do not represent the usual uncomplicated trio.",
    "GAS/pertussis do not form the usual uncomplicated sinusitis set.",
    "Pasteurella is a bite-exposure clue, not part of the usual uncomplicated sinusitis trio."
