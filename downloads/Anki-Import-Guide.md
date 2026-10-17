@@ -1,6 +1,6 @@
 # Study Grove Anki midterm deck
 
-404 cards: 139 focused recall cards and 205 clinical application cards and 60 exam-style MCQs (48 THERA and 12 AHAD).
+416 cards: 139 focused recall cards and 205 clinical application cards and 72 exam-style MCQs (60 THERA and 12 AHAD).
 
 ## Import on your Mac
 
@@ -17,7 +17,7 @@ Therapeutic goals, patient education, red flags, ranked differentials with reaso
 
 Answers retain references, reasoning and common errors. MUMS facts refer to the **2024 Anti-infective handbook checked October 16, 2026**. Seminar/product-specific material and other guidelines are labelled separately. Incomplete source prescriptions remain explicitly incomplete; no unknown infant FTU or conflicting isotretinoin regimen is guessed. No licensed MUMS handbook, textbook PDFs, browser notes or personal progress are bundled.
 
-AHAD midterm is entirely multiple choice. Open-recall cards are study exercises; its Exam-style MCQ subdeck matches the question format. THERA gives the diagnosis and emphasizes treatment selection and safe prescribing; its 48 new MCQs follow that format.
+AHAD midterm is entirely multiple choice. Open-recall cards are study exercises; its Exam-style MCQ subdeck matches the question format. THERA gives the diagnosis and emphasizes treatment selection and safe prescribing; 48 precise treatment MCQs follow that format. Twelve additional THERA organism-set questions are optional integrated recall, beyond the instructor’s organism-memorization requirements.
 
 Organism memorization is required by the supplied AHAD guidance; the supplied THERA guide does not require it. This is a targeted study deck, not a claim of complete exam coverage. Keep the 14 recommendation/footnote application questions in your review alongside the regimen cards.
 

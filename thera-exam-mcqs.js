@@ -1,640 +1,1216 @@
 'use strict';
-// Original exam-format questions aligned to instructor guidance supplied October 17, 2026.
+// Revised October 17: closely matched distractors and explicit option-by-option feedback.
 Object.assign(PRACTICE_SOURCES,{
  theraFoundations:{title:'Your THERA 1 notes: I Can PresCribE A Drug, blocks 353–368',url:'sources/THERA 1.docx'},
- cnoNPOct2026:{title:'CNO Nurse Practitioner standard: therapeutic management p. 5; checked October 17, 2026',url:'https://cno.org/Assets/CNO/Documents/Standard-and-Learning/Practice-Standards/41038_strdrnec.pdf'},
- cnoNPFAQ:{title:'CNO NP practice FAQs: consultation and competence',url:'https://www.cno.org/standards-learning/nurse-practitioners/np-practice-faqs'}
+ cnoNPOct2026:{title:'CNO Nurse Practitioner standard',url:'https://cno.org/Assets/CNO/Documents/Standard-and-Learning/Practice-Standards/41038_strdrnec.pdf'},
+ cnoNPFAQ:{title:'CNO NP practice FAQs',url:'https://www.cno.org/standards-learning/nurse-practitioners/np-practice-faqs'}
 });
 const THERA_EXAM_ROWS=[
  {
-  "id": "indication",
-  "parent": "framework",
-  "skill": "framework",
-  "prompt": "An adult is diagnosed with a self-limited viral URI and requests an antibiotic before travel. Which ICANPRESCRIBE question comes first?",
-  "options": [
-   "Is medication indicated for this diagnosis and patient?",
-   "Which antibiotic costs least?",
-   "Which antibiotic has the shortest course?",
-   "Which antibiotic is taken once daily?"
-  ],
-  "why": "Indication precedes selecting an antibiotic. Cost and convenience matter after establishing a reason to use medication; a viral diagnosis alone does not create an antibiotic indication."
- },
- {
-  "id": "contraindication",
-  "parent": "framework",
-  "skill": "framework",
-  "prompt": "A pregnant patient with diagnosed acne asks to restart oral isotretinoin. Which framework component most directly prevents this prescription?",
-  "options": [
-   "Contraindications",
-   "Cost and adherence",
-   "Dosage convenience",
-   "Comparative efficacy alone"
-  ],
-  "why": "A contraindication can exclude a drug despite efficacy or convenience. Changing the dose does not remove this pregnancy risk."
- },
- {
-  "id": "affordability",
-  "parent": "framework",
-  "skill": "framework",
-  "prompt": "Two treatments are suitable for a supplied diagnosis. The patient cannot afford one and struggles with four daily doses. What should guide the shared choice?",
-  "options": [
-   "Discuss coverage, cost and feasible dosing while preserving efficacy and safety",
-   "Choose the expensive option because price proves efficacy",
-   "Prescribe half an effective dose to reduce cost",
-   "Label the patient nonadherent before exploring barriers"
-  ],
-  "why": "Cost/adherence is a framework component. Address actual barriers with the patient; price and an ineffective dose cannot substitute for a suitable regimen."
- },
- {
-  "id": "directions",
-  "parent": "framework",
-  "skill": "framework",
-  "prompt": "A selected antibiotic is suitable, but the draft says only “take as directed.” Which framework component remains incomplete?",
-  "options": [
-   "Dosage, duration and directions",
-   "Indication alone",
-   "Comparative efficacy alone",
-   "Cost alone"
-  ],
-  "why": "A suitable drug still needs executable directions. Resolve strength, dose, route, frequency, definite duration and matching quantity before signing."
- },
- {
-  "id": "consult",
-  "parent": "cno",
-  "skill": "professional",
-  "prompt": "An NP has legal authority to manage a supplied diagnosis but lacks competence in this patient’s complex treatment. What is best?",
-  "options": [
-   "Consult appropriately and clarify responsibility for the plan",
-   "Prescribe independently because authority establishes competence",
-   "Transfer accountability to the dispensing pharmacist",
-   "Wait for routine follow-up before communicating"
-  ],
-  "why": "Individual competence can require consultation within legal scope. Clarify follow-up responsibilities; consultation does not erase the NP’s accountability."
- },
- {
-  "id": "shared-plan",
-  "parent": "cno",
-  "skill": "professional",
-  "prompt": "A patient with a diagnosed condition declines the proposed drug because of cost and previous adverse effects. What is best?",
-  "options": [
-   "Discuss suitable options and agree on a feasible plan",
-   "Repeat the order without discussing concerns",
-   "Discharge the patient immediately for declining",
-   "Choose solely by lowest purchase price"
-  ],
-  "why": "Treatment planning includes patient preferences and circumstances. Discuss suitable options and barriers rather than imposing an unworkable order."
- },
- {
-  "id": "monitor",
-  "parent": "cno",
-  "skill": "professional",
-  "prompt": "A new medication is selected for a diagnosed condition. Which plan best completes therapeutic management?",
-  "options": [
-   "Define response/safety measures, review timing and who acts on results",
-   "Order baseline tests without arranging result review",
-   "Review only if the patient elects to stop",
-   "Continue indefinitely if no complaint is volunteered"
-  ],
-  "why": "Monitoring needs review and action. Specify timing and responsibilities, then change treatment according to response; testing alone leaves the loop incomplete."
- },
- {
-  "id": "reconcile",
-  "parent": "cno",
-  "skill": "professional",
-  "prompt": "Before prescribing for a supplied diagnosis, the NP learns the patient takes OTC medicines and herbal supplements. What is best?",
-  "options": [
-   "Include prescribed, OTC and complementary products in the medication review",
-   "Review prescription drugs only",
-   "Recommend every natural product as a safer option",
-   "Stop all existing drugs without reviewing indications"
-  ],
-  "why": "Medication review needs the full picture. Investigate actual use and relevant risks rather than assuming supplements are harmless or stopping everything indiscriminately."
- },
- {
-  "id": "aom-dose",
-  "parent": "aom-first",
-  "skill": "dose",
-  "prompt": "A 15-month-old has diagnosed AOM and is selected for amoxicillin. No allergy or renal impairment. Which MUMS regimen fits?",
-  "options": [
-   "80–90 mg/kg/DAY divided BID or TID for 10 days; maximum 4 g/day",
-   "80–90 mg/kg/DOSE BID for 10 days",
-   "40 mg/kg/DAY for 3 days",
-   "80–90 mg/kg/DAY for 5 days because all uncomplicated AOM uses 5 days"
-  ],
-  "why": "MUMS gives a DAILY total, not a per-dose amount. Age under 2 supports 10 days; do not transfer the older-child course to this toddler."
- },
- {
-  "id": "aom-rash",
-  "parent": "aom-allergy",
-  "skill": "allergy",
-  "prompt": "A 16-month-old with diagnosed AOM had a benign delayed amoxicillin rash, without immediate urticaria, anaphylaxis or a severe delayed reaction. Which MUMS alternative fits?",
-  "options": [
-   "Cefprozil 30 mg/kg/DAY divided BID, maximum 1 g/day, for 10 days",
-   "Cefprozil 30 mg/kg/DOSE BID for 10 days",
-   "Apply the same cephalosporin plan to anaphylaxis without review",
-   "Cefprozil for 3 days regardless of age"
-  ],
-  "why": "For this specified benign rash, MUMS lists cefprozil at a daily total divided BID. Immediate/severe reactions require separate assessment; age still affects duration."
- },
- {
-  "id": "aom-calc",
-  "parent": "aom-stella",
-  "skill": "calculation",
-  "prompt": "A 10-kg toddler with diagnosed AOM is prescribed amoxicillin 90 mg/kg/DAY divided BID for 10 days. Suspension is 400 mg/5 mL. Which unrounded dose and quantity are correct?",
-  "options": [
-   "5.625 mL/dose; 112.5 mL total",
-   "11.25 mL/dose; 225 mL total",
-   "5.625 mL/dose; 56.25 mL total",
-   "2.8125 mL/dose; 56.25 mL total"
-  ],
-  "why": "900 mg/day ÷ 2 = 450 mg/dose. At 80 mg/mL this is 5.625 mL; 20 doses need 112.5 mL before measurable-dose rounding/package allowance. Recalculate quantity if the prescribed volume is rounded."
- },
- {
-  "id": "aom-review",
-  "parent": "aom-ome",
-  "skill": "followup",
-  "prompt": "A child’s diagnosed AOM has resolved clinically but asymptomatic effusion remains. The caregiver requests more antibiotics. Which plan is best?",
-  "options": [
-   "Explain residual fluid and monitor hearing, with assessment for persistent concerns",
-   "Repeat antibiotics until all fluid disappears",
-   "Switch antibiotics because fluid alone establishes resistance",
-   "Use an antihistamine solely to eradicate the effusion"
-  ],
-  "why": "Residual fluid alone does not establish persistent infection. Avoid unnecessary antibiotics while keeping a hearing/speech follow-up plan."
- },
- {
-  "id": "oe-tm",
-  "parent": "oe-first",
-  "skill": "safety",
-  "prompt": "Otitis externa is diagnosed, but an intact TM cannot be verified. Which selected MUMS treatment fits this uncertainty?",
-  "options": [
-   "Ciprodex 4 drops in the affected ear BID for 7 days",
-   "Vinegar/alcohol drops despite uncertain TM integrity",
-   "An aminoglycoside-containing drop without checking TM safety",
-   "Oral amoxicillin alone for canal-limited disease"
-  ],
-  "why": "The linked OE regimen uses a suitable non-ototoxic option when a defect is possible. Potentially ototoxic or irritating products should not be chosen on an unverified assumption; canal-limited disease usually needs local delivery."
- },
- {
-  "id": "oe-instructions",
-  "parent": "oe-nonpharm",
-  "skill": "education",
-  "prompt": "A patient with diagnosed otitis externa asks how to support prescribed drops. Which advice is best?",
-  "options": [
-   "Keep the canal dry, avoid swabs and review obstructed drop delivery",
-   "Clean deeply with swabs before every dose",
-   "Continue swimming if pain temporarily improves",
-   "Stop drops after the first helpful dose"
-  ],
-  "why": "Correct delivery and avoiding water/trauma support local treatment. If swelling prevents delivery, arrange review; initial improvement does not replace the prescribed course."
- },
- {
-  "id": "oe-escalation",
-  "parent": "oe-redflags",
-  "skill": "referral",
-  "prompt": "An older adult with diabetes has diagnosed otitis externa and severe persistent deep pain despite treatment. What is best?",
-  "options": [
-   "Urgent reassessment for invasive disease and specialist/emergency care as indicated",
-   "Repeat drops without examining the ear",
-   "Add a sedating antihistamine and wait two weeks",
-   "Stop assessment because the diagnosis was supplied"
-  ],
-  "why": "Diabetes and severe persistent/deep pain warrant urgent review for invasive disease. Assess spread, systemic illness and cranial nerve findings instead of treating the original label as permanently sufficient."
- },
- {
-  "id": "eye-review",
-  "parent": "conjunctivitis-failure",
-  "skill": "followup",
-  "prompt": "Diagnosed conjunctivitis is not improving with initial treatment. What is best before simply changing antibiotics?",
-  "options": [
-   "Review acuity, pain/photophobia, cornea, contact lenses, technique and alternative causes",
-   "Broaden antibiotics without assessing vision",
-   "Add ocular steroid independently",
-   "Continue unchanged for weeks"
-  ],
-  "why": "Failure may reflect incorrect delivery, an alternative cause or corneal disease. Reassess before broadening treatment or suppressing inflammation."
- },
- {
-  "id": "eye-contact",
-  "parent": "conjunctivitis-contact",
-  "skill": "referral",
-  "prompt": "A contact-lens wearer previously labelled as conjunctivitis develops pain, photophobia and reduced vision. What is best?",
-  "options": [
-   "Urgent eye-capable assessment for possible corneal infection and treatment",
-   "Routine refill with review in a month",
-   "Unsupervised ocular steroid drops",
-   "Resume lenses when discharge decreases"
-  ],
-  "why": "Pain, photophobia and visual change alter urgency. Consider keratitis/corneal disease; routine refills and ocular steroids without appropriate examination do not address this risk."
- },
- {
-  "id": "aom-prevention",
-  "parent": "aom-nonpharm",
-  "skill": "nonpharm",
-  "prompt": "After a toddler’s AOM diagnosis, which non-drug advice set fits the supplied teaching?",
-  "options": [
-   "Avoid smoke exposure, avoid supine bottle feeding and review prolonged pacifier use",
-   "Continuous antibiotics and bottles in bed",
-   "Deep canal cleaning and restricting fluids",
-   "Long-term topical nasal decongestants"
-  ],
-  "why": "These supported measures address modifiable exposures and feeding practices without guaranteeing prevention. Chronic medication or instrumentation is not a substitute."
- },
- {
-  "id": "gas-penv",
+  "id": "gas-amox-exact",
   "parent": "gas-first",
   "skill": "regimen",
-  "prompt": "An adult has diagnosed GAS, no penicillin allergy and normal renal function. Which penicillin V regimen matches MUMS?",
+  "prompt": "An adult with confirmed GAS pharyngitis has no allergy or renal impairment. Which amoxicillin order matches MUMS 2024?",
   "options": [
-   "600 mg PO BID for 10 days",
-   "600 mg once daily for 3 days",
-   "300 mg BID for 5 days",
-   "600 mg TID for 3 days"
+   "500 mg PO BID × 10 days",
+   "500 mg PO TID × 5 days",
+   "500 mg PO BID × 7 days",
+   "250 mg PO TID × 10 days"
   ],
-  "why": "MUMS lists penicillin V 600 mg BID or 300 mg TID for 10 days. The other schedules do not match this indication."
+  "why": "500 mg twice daily for 10 days matches this adult GAS regimen.",
+  "optionRationales": [
+   "500 mg twice daily for 10 days matches this adult GAS regimen.",
+   "This changes both frequency and duration; the sinusitis schedule is not the GAS schedule.",
+   "The dose/frequency fit, but the 7-day duration does not match this GAS regimen.",
+   "This dose/frequency does not match the referenced adult amoxicillin regimen."
+  ],
+  "priorId": "thera-exam-20261017-gas-penv"
  },
  {
-  "id": "gas-child-volume",
-  "parent": "gas-child",
-  "skill": "calculation",
-  "prompt": "A 25-kg child has diagnosed GAS. Selected MUMS amoxicillin is 40 mg/kg/DAY divided BID for 10 days, maximum 1 g/day. Suspension is 250 mg/5 mL. Which is correct?",
+  "id": "gas-penv-exact",
+  "parent": "gas-first",
+  "skill": "regimen",
+  "prompt": "For an adult with confirmed GAS, which penicillin V order matches one MUMS regimen?",
   "options": [
-   "10 mL BID; 200 mL total",
-   "20 mL BID; 400 mL total",
-   "10 mL once daily; 100 mL total",
-   "5 mL BID; 100 mL total"
+   "300 mg PO TID × 10 days",
+   "300 mg PO BID × 10 days",
+   "600 mg PO BID × 5 days",
+   "600 mg PO once daily × 10 days"
   ],
-  "why": "40 × 25 = 1000 mg/day, at the stated maximum. Divide into 500 mg doses; 50 mg/mL gives 10 mL. Twenty doses require 200 mL. Do not interpret the daily total as a per-dose amount."
+  "why": "MUMS lists 300 mg TID or 600 mg BID, each for 10 days.",
+  "optionRationales": [
+   "MUMS lists 300 mg TID or 600 mg BID, each for 10 days.",
+   "The 300-mg option requires TID, not BID.",
+   "600 mg BID is listed, but not this 5-day course.",
+   "The 600-mg option requires BID, not once daily."
+  ],
+  "priorId": "thera-exam-20261017-indication"
  },
  {
-  "id": "gas-allergy",
+  "id": "gas-macrolide-exact",
   "parent": "gas-anaphylaxis",
   "skill": "allergy",
-  "prompt": "An adult with diagnosed GAS reports immediate urticaria and respiratory compromise after penicillin. A macrolide is considered. What is essential?",
+  "prompt": "An adult with GAS had immediate penicillin anaphylaxis. Interaction, QT and resistance review supports clarithromycin. Which order matches MUMS?",
   "options": [
-   "Review interactions, QT risk and local susceptibility before selecting the alternative",
-   "Treat this as a benign delayed rash and use penicillin",
-   "Assume all macrolides have the same dose and duration",
-   "Select cephalexin automatically without allergy review"
+   "Clarithromycin 250 mg PO BID × 10 days",
+   "Clarithromycin 250 mg PO once daily × 10 days",
+   "Clarithromycin 500 mg PO daily × 3 days",
+   "Clarithromycin 500 mg day 1, then 250 mg daily days 2–5"
   ],
-  "why": "The immediate severe reaction changes selection. A macrolide still needs resistance/safety review and its own exact regimen; benign-rash logic does not apply."
+  "why": "Clarithromycin is 250 mg BID for 10 days in this source.",
+  "optionRationales": [
+   "Clarithromycin is 250 mg BID for 10 days in this source.",
+   "The frequency is too low for the referenced regimen.",
+   "This dose/duration is not the listed clarithromycin GAS course.",
+   "This borrows the azithromycin step-down pattern rather than the clarithromycin regimen."
+  ],
+  "priorId": "thera-exam-20261017-gas-allergy"
  },
  {
-  "id": "gas-azithro",
+  "id": "gas-azithro-exact",
   "parent": "gas-azithro",
   "skill": "regimen",
-  "prompt": "Azithromycin is selected after allergy, interaction and resistance review for adult diagnosed GAS. Which MUMS regimen fits?",
+  "prompt": "Azithromycin is selected for adult GAS after the relevant safety/resistance review. Which complete order matches MUMS?",
   "options": [
-   "500 mg day 1, then 250 mg daily on days 2–5",
-   "250 mg BID for 10 days",
-   "500 mg daily for 10 days",
-   "250 mg once on day 1 only"
+   "500 mg PO day 1, then 250 mg daily days 2–5",
+   "500 mg PO day 1, then 250 mg daily days 2–10",
+   "250 mg PO BID × 10 days",
+   "250 mg PO daily × 5 days"
   ],
-  "why": "This azithromycin course uses a loading dose and four lower doses. Clarithromycin is 250 mg BID for 10 days here; schedules cannot be interchanged."
+  "why": "A 500-mg first dose plus four 250-mg doses completes the 5-day regimen.",
+  "optionRationales": [
+   "A 500-mg first dose plus four 250-mg doses completes the 5-day regimen.",
+   "The step-down dose is continued too long for this referenced course.",
+   "This is the clarithromycin schedule, not the azithromycin schedule.",
+   "This omits the 500-mg day-1 dose."
+  ],
+  "priorId": "thera-exam-20261017-gas-azithro"
  },
  {
-  "id": "gas-lactation",
-  "parent": "gas-preg",
-  "skill": "lactation",
-  "prompt": "A breastfeeding adult with diagnosed GAS has no penicillin allergy or renal impairment. Amoxicillin is selected. Which plan fits?",
+  "id": "gas-child-calc",
+  "parent": "gas-child",
+  "skill": "calculation",
+  "prompt": "A 25-kg child with GAS is prescribed amoxicillin 40 mg/kg/DAY divided BID × 10 days, maximum 1 g/day. Suspension: 250 mg/5 mL. Which dose and quantity are correct?",
   "options": [
-   "500 mg PO BID for 10 days; observe the infant for diarrhea, rash or thrush",
-   "Use the child’s suspension volume as the maternal dose",
-   "Stop breastfeeding automatically throughout treatment",
-   "Choose doxycycline solely because of breastfeeding"
+   "10 mL PO BID; 200 mL",
+   "20 mL PO BID; 400 mL",
+   "10 mL PO once daily; 100 mL",
+   "5 mL PO BID; 100 mL"
   ],
-  "why": "The parent card links MUMS adult dosing and separate lactation guidance. Breastfeeding does not automatically require interruption; review infant effects and avoid borrowing pediatric mL instructions."
+  "why": "1000 mg/day ÷ 2 = 500 mg/dose; 50 mg/mL gives 10 mL, and 20 doses need 200 mL.",
+  "optionRationales": [
+   "1000 mg/day ÷ 2 = 500 mg/dose; 50 mg/mL gives 10 mL, and 20 doses need 200 mL.",
+   "This treats the daily total as each BID dose and doubles the prescribed daily amount.",
+   "This supplies only half the prescribed daily amount.",
+   "This also supplies half the prescribed daily amount, through halving each BID dose."
+  ],
+  "priorId": "thera-exam-20261017-gas-child-volume"
  },
  {
-  "id": "sinus-adult",
+  "id": "gas-child-max",
+  "parent": "gas-child",
+  "skill": "calculation",
+  "prompt": "A 40-kg child with GAS is assigned amoxicillin 40 mg/kg/DAY divided BID, maximum 1 g/day, × 10 days. Suspension: 400 mg/5 mL. Which unrounded order applies the maximum?",
+  "options": [
+   "6.25 mL PO BID; 125 mL",
+   "10 mL PO BID; 200 mL",
+   "12.5 mL PO BID; 250 mL",
+   "6.25 mL PO TID; 187.5 mL"
+  ],
+  "why": "The calculated 1600 mg/day is capped at 1000; 500 mg/dose ÷ 80 mg/mL = 6.25 mL BID.",
+  "optionRationales": [
+   "The calculated 1600 mg/day is capped at 1000; 500 mg/dose ÷ 80 mg/mL = 6.25 mL BID.",
+   "This uses the uncapped 1600-mg daily amount.",
+   "This gives 2000 mg/day, exceeding the specified maximum.",
+   "The per-dose volume fits BID, but TID gives 1500 mg/day."
+  ],
+  "priorId": "thera-exam-20261017-contraindication"
+ },
+ {
+  "id": "aom-dose-exact",
+  "parent": "aom-first",
+  "skill": "dose",
+  "prompt": "A 15-month-old with AOM is selected for MUMS amoxicillin, with normal renal function. Which order matches its high-dose daily range and age-specific duration?",
+  "options": [
+   "80–90 mg/kg/DAY PO divided BID or TID × 10 days",
+   "80–90 mg/kg/DOSE PO BID × 10 days",
+   "80–90 mg/kg/DAY PO divided BID × 5 days",
+   "40 mg/kg/DAY PO divided BID × 10 days"
+  ],
+  "why": "Use the 80–90 mg/kg daily total, divided into doses; age under 2 requires 10 days here.",
+  "optionRationales": [
+   "Use the 80–90 mg/kg daily total, divided into doses; age under 2 requires 10 days here.",
+   "This turns the daily range into each dose, greatly increasing daily exposure.",
+   "The high-dose range fits, but the 5-day course does not fit this age.",
+   "This borrows the MUMS GAS daily amount rather than the cited high-dose AOM range."
+  ],
+  "priorId": "thera-exam-20261017-aom-dose"
+ },
+ {
+  "id": "aom-age-three",
+  "parent": "aom-duration",
+  "skill": "duration",
+  "prompt": "Using MUMS, match AOM durations for: a 13-month-old; a 5-year-old with uncomplicated disease; a 5-year-old with recurrent disease.",
+  "options": [
+   "10 days; 5 days; 10 days",
+   "10 days; 5 days; 5 days",
+   "5 days; 5 days; 10 days",
+   "10 days; 10 days; 5 days"
+  ],
+  "why": "Young age and recurrent/complicated disease need 10 days; uncomplicated disease over age 2 uses 5 days.",
+  "optionRationales": [
+   "Young age and recurrent/complicated disease need 10 days; uncomplicated disease over age 2 uses 5 days.",
+   "This incorrectly gives recurrent disease the short course.",
+   "This incorrectly gives the under-2 child the short course.",
+   "This reverses the uncomplicated/recurrent distinction in the older children."
+  ],
+  "priorId": "thera-exam-20261017-affordability"
+ },
+ {
+  "id": "aom-benign-rash",
+  "parent": "aom-allergy",
+  "skill": "allergy",
+  "prompt": "A 16-month-old with AOM had a benign delayed amoxicillin rash, not immediate or severe delayed allergy. Which cefprozil order matches MUMS?",
+  "options": [
+   "30 mg/kg/DAY PO divided BID × 10 days; max 1 g/day",
+   "30 mg/kg/DOSE PO BID × 10 days; max 1 g/dose",
+   "30 mg/kg/DAY PO divided BID × 5 days; max 1 g/day",
+   "15 mg/kg/DAY PO divided BID × 10 days; max 1 g/day"
+  ],
+  "why": "The listed total is 30 mg/kg/day in two doses, maximum 1 g/day; this age uses 10 days.",
+  "optionRationales": [
+   "The listed total is 30 mg/kg/day in two doses, maximum 1 g/day; this age uses 10 days.",
+   "This doubles the daily amount and misstates the maximum as per dose.",
+   "The dose is right, but the age-specific duration is too short.",
+   "This halves the referenced total daily amount."
+  ],
+  "priorId": "thera-exam-20261017-aom-rash"
+ },
+ {
+  "id": "aom-calc-exact",
+  "parent": "aom-stella",
+  "skill": "calculation",
+  "prompt": "A 10-kg toddler with AOM is prescribed amoxicillin 90 mg/kg/DAY divided BID × 10 days. Suspension: 400 mg/5 mL. Which unrounded dose/course volume is correct?",
+  "options": [
+   "5.625 mL BID; 112.5 mL",
+   "11.25 mL BID; 225 mL",
+   "5.625 mL BID; 56.25 mL",
+   "2.8125 mL BID; 56.25 mL"
+  ],
+  "why": "900 mg/day ÷ 2 = 450 mg/dose; at 80 mg/mL this is 5.625 mL. Twenty doses need 112.5 mL before measurable rounding/package allowance.",
+  "optionRationales": [
+   "900 mg/day ÷ 2 = 450 mg/dose; at 80 mg/mL this is 5.625 mL. Twenty doses need 112.5 mL before measurable rounding/package allowance.",
+   "This gives the entire daily amount at each BID dose.",
+   "The dose is right but the supply covers only 5 days.",
+   "This halves the dose and provides only half the required daily amount."
+  ],
+  "priorId": "thera-exam-20261017-aom-calc"
+ },
+ {
+  "id": "aom-cefprozil-calc",
+  "parent": "aom-allergy",
+  "skill": "calculation",
+  "prompt": "For a 20-kg child with AOM, cefprozil 30 mg/kg/DAY divided BID × 5 days is selected after benign-rash review. Suspension: 250 mg/5 mL. Which order is correct?",
+  "options": [
+   "6 mL PO BID; 60 mL",
+   "12 mL PO BID; 120 mL",
+   "3 mL PO BID; 30 mL",
+   "6 mL PO TID; 90 mL"
+  ],
+  "why": "600 mg/day ÷ 2 = 300 mg/dose; at 50 mg/mL this is 6 mL. Ten doses need 60 mL.",
+  "optionRationales": [
+   "600 mg/day ÷ 2 = 300 mg/dose; at 50 mg/mL this is 6 mL. Ten doses need 60 mL.",
+   "This doubles the prescribed daily amount.",
+   "This halves the prescribed daily amount.",
+   "This changes the supplied BID regimen to TID, increasing daily exposure."
+  ],
+  "priorId": "thera-exam-20261017-directions"
+ },
+ {
+  "id": "oe-exact",
+  "parent": "oe-first",
+  "skill": "regimen",
+  "prompt": "Otitis externa is diagnosed with uncertain TM integrity. Ciprofloxacin 0.3%/dexamethasone 0.1% otic suspension is selected. Which MUMS OE order is correct?",
+  "options": [
+   "4 drops in the affected ear BID × 7 days",
+   "2 drops in the affected ear BID × 7 days",
+   "4 drops in the affected ear once daily × 7 days",
+   "4 drops in the affected ear BID × 5 days"
+  ],
+  "why": "The referenced OE regimen is 4 drops BID for 7 days; this is not a tube-otorrhea duration item.",
+  "optionRationales": [
+   "The referenced OE regimen is 4 drops BID for 7 days; this is not a tube-otorrhea duration item.",
+   "This halves the specified number of drops.",
+   "This halves the specified administration frequency.",
+   "This shortens the specified OE course."
+  ],
+  "priorId": "thera-exam-20261017-oe-tm"
+ },
+ {
+  "id": "eye-fusidic-exact",
+  "parent": "conjunctivitis-first",
+  "skill": "regimen",
+  "prompt": "Fusidic acid 1% ophthalmic drops are selected for uncomplicated bacterial conjunctivitis. Which MUMS-listed schedule fits? This is one option, not a universal first line.",
+  "options": [
+   "1 drop in affected eye(s) BID × 5–7 days",
+   "1 drop in affected eye(s) once daily × 5–7 days",
+   "2 drops in affected eye(s) QID × 5–7 days",
+   "1 drop in affected eye(s) BID × 10–14 days"
+  ],
+  "why": "The cited option is one drop twice daily for 5–7 days; write a definite duration when prescribing.",
+  "optionRationales": [
+   "The cited option is one drop twice daily for 5–7 days; write a definite duration when prescribing.",
+   "Once daily does not match this referenced schedule.",
+   "This increases both drops and frequency beyond this schedule.",
+   "This duration does not match this listed uncomplicated conjunctivitis regimen."
+  ],
+  "priorId": "thera-exam-20261017-consult"
+ },
+ {
+  "id": "sinus-adult-exact",
   "parent": "sinusitis-first",
   "skill": "regimen",
-  "prompt": "An adult has diagnosed bacterial sinusitis requiring antibiotics, without allergy or renal impairment. Which MUMS prescription plan is complete?",
+  "prompt": "An adult with bacterial sinusitis needs antibiotics, has no allergy and normal renal function. A 7-day course is chosen. Which MUMS amoxicillin order fits?",
   "options": [
-   "Amoxicillin 500 mg TID with a definite course selected within 5–10 days",
-   "Amoxicillin 500 mg TID with no duration",
-   "Amoxicillin 500 mg once as the entire course",
-   "Write 5–10 days and let the patient choose the duration without a plan"
+   "500 mg PO TID × 7 days",
+   "500 mg PO BID × 7 days",
+   "500 mg PO once daily × 7 days",
+   "250 mg PO TID × 7 days"
   ],
-  "why": "Select a definite course within the source range. The range itself does not instruct the patient how long to take treatment; dose and frequency do not resolve omitted duration."
+  "why": "MUMS lists adult sinusitis amoxicillin 500 mg TID, with 7 days within its general 5–10-day range.",
+  "optionRationales": [
+   "MUMS lists adult sinusitis amoxicillin 500 mg TID, with 7 days within its general 5–10-day range.",
+   "This borrows the adult GAS frequency instead of the referenced sinusitis frequency.",
+   "This reduces the frequency to once daily.",
+   "This halves each dose from the referenced adult sinusitis regimen."
+  ],
+  "priorId": "thera-exam-20261017-sinus-adult"
  },
  {
-  "id": "sinus-child",
-  "parent": "sinusitis-child",
+  "id": "sinus-preg-exact",
+  "parent": "sinusitis-preg",
+  "skill": "pregnancy",
+  "prompt": "A pregnant adult with bacterial sinusitis needs antibiotics, has no penicillin allergy and normal renal function. A 7-day course is selected. Which option matches the MUMS regimen and linked pregnancy guidance?",
+  "options": [
+   "Amoxicillin 500 mg PO TID × 7 days",
+   "Amoxicillin 500 mg PO BID × 7 days",
+   "Doxycycline 100 mg PO BID day 1, then daily days 2–7",
+   "Amoxicillin 250 mg PO TID × 7 days"
+  ],
+  "why": "Amoxicillin is supported in pregnancy; the listed adult sinusitis regimen is 500 mg TID.",
+  "optionRationales": [
+   "Amoxicillin is supported in pregnancy; the listed adult sinusitis regimen is 500 mg TID.",
+   "The drug is appropriate but BID does not match this MUMS sinusitis schedule.",
+   "The schedule is a listed nonpregnancy alternative, but doxycycline is not the routine pregnancy choice here.",
+   "This uses half the listed adult dose."
+  ],
+  "priorId": "thera-exam-20261017-shared-plan"
+ },
+ {
+  "id": "sinus-doxy-exact",
+  "parent": "sinusitis-doxy",
   "skill": "regimen",
-  "prompt": "A child with diagnosed bacterial sinusitis is selected for MUMS amoxicillin. Which statement fits?",
+  "prompt": "For a nonpregnant adult with bacterial sinusitis, a MUMS doxycycline course lasting SEVEN total days is selected. Which order and 100-mg-tablet quantity match?",
   "options": [
-   "80 mg/kg/DAY divided BID or TID, maximum 4 g/day; usual duration 10–14 days",
-   "80 mg/kg/DOSE TID for 5 days",
-   "Use 5 days for all children because AOM may use 5 days",
-   "Use half the adult tablet dose without weight calculation"
+   "100 mg BID day 1, then daily days 2–7; 8 tablets",
+   "100 mg BID day 1, then daily days 2–7; 7 tablets",
+   "100 mg BID days 1–7; 14 tablets",
+   "100 mg daily days 1–7; 7 tablets"
   ],
-  "why": "The sinusitis course differs from uncomplicated older-child AOM. Use the daily total and indication-specific duration; do not guess a fraction of an adult dose."
+  "why": "Two tablets on day 1 plus six on days 2–7 equals 8.",
+  "optionRationales": [
+   "Two tablets on day 1 plus six on days 2–7 equals 8.",
+   "The directions need 8 tablets, not 7.",
+   "This continues the loading-day frequency through the full course.",
+   "This omits the second day-1 dose."
+  ],
+  "priorId": "thera-exam-20261017-monitor"
  },
  {
-  "id": "sinus-day3",
-  "parent": "sinusitis-reassess",
-  "skill": "followup",
-  "prompt": "An adult with diagnosed bacterial sinusitis has no improvement around treatment day 3. What is best?",
+  "id": "sinus-child-exact",
+  "parent": "sinusitis-child",
+  "skill": "dose",
+  "prompt": "A child with bacterial sinusitis is selected for MUMS amoxicillin. Which daily dose and usual duration fit?",
   "options": [
-   "Reassess adherence, diagnosis, complications and treatment selection",
-   "Double the antibiotic dose without assessment",
-   "Continue indefinitely without a review date",
-   "Start ocular steroid for facial pressure"
+   "80 mg/kg/DAY divided BID or TID × 10–14 days; max 4 g/day",
+   "80 mg/kg/DOSE BID × 10–14 days; max 4 g/day",
+   "80 mg/kg/DAY divided BID × 5 days; max 4 g/day",
+   "40 mg/kg/DAY divided BID × 10 days; max 1 g/day"
   ],
-  "why": "Nonresponse prompts review rather than automatic dose escalation. Orbital swelling/visual change, severe headache, toxicity or altered mental state requires urgent escalation."
+  "why": "The source gives 80 mg/kg/day divided into doses, usual 10–14 days, maximum 4 g/day.",
+  "optionRationales": [
+   "The source gives 80 mg/kg/day divided into doses, usual 10–14 days, maximum 4 g/day.",
+   "This makes 80 mg/kg the per-dose amount rather than daily amount.",
+   "This imports the short older-child AOM course.",
+   "This borrows the MUMS pediatric GAS regimen rather than sinusitis."
+  ],
+  "priorId": "thera-exam-20261017-sinus-child"
  },
  {
-  "id": "rhinitis-technique",
-  "parent": "rhinitis-technique",
-  "skill": "education",
-  "prompt": "A patient with diagnosed allergic rhinitis inconsistently uses an intranasal corticosteroid, points at the septum and reports minor bleeding. What is best?",
-  "options": [
-   "Review regular use and technique, aim away from the septum and reassess irritation",
-   "Increase dose without technique review",
-   "Use daily topical decongestant indefinitely",
-   "Sniff forcefully toward the septum"
-  ],
-  "why": "Correct technique and consistent use before assuming treatment failure. Address irritation; topical decongestant overuse can cause rebound symptoms."
- },
- {
-  "id": "rhinitis-older",
+  "id": "rhinitis-spray-exact",
   "parent": "rhinitis-aaron",
-  "skill": "older-adult",
-  "prompt": "An older adult with diagnosed allergic rhinitis has congestion and daytime drowsiness on a first-generation antihistamine. What fits the seminar plan?",
+  "skill": "regimen",
+  "prompt": "An eligible adult with allergic rhinitis is selected for the seminar’s azelastine/fluticasone combination nasal product at its labelled strength. Which directions match the seminar?",
   "options": [
-   "Review the sedating drug and use appropriate intranasal anti-inflammatory treatment with teaching",
-   "Add another sedating antihistamine",
-   "Escalate the first-generation drug solely for congestion",
-   "Use continuous topical decongestant as maintenance"
+   "1 spray in each nostril BID",
+   "1 spray in each nostril once daily",
+   "2 sprays in each nostril once weekly",
+   "2 sprays in one nostril BID, alternating nostrils daily"
   ],
-  "why": "Match therapy to symptoms while limiting sedation and harm. The seminar uses an intranasal anti-inflammatory-containing option; stacking sedating drugs and decongestant overuse do not solve the problem."
+  "why": "The seminar regimen is one spray in each nostril twice daily; confirm product/age eligibility.",
+  "optionRationales": [
+   "The seminar regimen is one spray in each nostril twice daily; confirm product/age eligibility.",
+   "This halves the daily frequency.",
+   "Weekly administration does not match the prescribed daily regimen.",
+   "Each administration should treat both nostrils as prescribed, not alternate sides by day."
+  ],
+  "priorId": "thera-exam-20261017-rhinitis-older"
  },
  {
-  "id": "impetigo-local",
+  "id": "croup-dex-exact",
+  "parent": "croup-dex",
+  "skill": "regimen",
+  "prompt": "A child has diagnosed croup. Which dexamethasone schedule matches the referenced regimen, before applying the locally specified maximum?",
+  "options": [
+   "0.6 mg/kg PO once",
+   "0.6 mg/kg PO daily × 5 days",
+   "0.06 mg/kg PO once",
+   "0.6 mg/kg/DAY PO divided BID × 3 days"
+  ],
+  "why": "This regimen is a single oral 0.6-mg/kg dose; verify the local maximum and preparation.",
+  "optionRationales": [
+   "This regimen is a single oral 0.6-mg/kg dose; verify the local maximum and preparation.",
+   "This turns one-dose treatment into five doses.",
+   "This is a tenfold lower dose.",
+   "This changes the supplied one-dose regimen into a repeated divided course."
+  ],
+  "priorId": "thera-exam-20261017-reconcile"
+ },
+ {
+  "id": "croup-calc-exact",
+  "parent": "croup-dex",
+  "skill": "calculation",
+  "prompt": "A 14-kg child with croup is assigned dexamethasone 0.6 mg/kg PO once. The local maximum is 10 mg; liquid is 2 mg/mL. Which dose and volume are correct?",
+  "options": [
+   "8.4 mg; 4.2 mL once",
+   "8.4 mg; 8.4 mL once",
+   "10 mg; 5 mL once",
+   "0.84 mg; 0.42 mL once"
+  ],
+  "why": "14 × 0.6 = 8.4 mg, below the supplied maximum; divide by 2 mg/mL for 4.2 mL.",
+  "optionRationales": [
+   "14 × 0.6 = 8.4 mg, below the supplied maximum; divide by 2 mg/mL for 4.2 mL.",
+   "This treats the liquid as 1 mg/mL.",
+   "A maximum is a ceiling, not a dose to give every child.",
+   "This introduces a tenfold calculation error."
+  ],
+  "priorId": "thera-exam-20261017-aom-review"
+ },
+ {
+  "id": "pertussis-exact",
+  "parent": "pertussis-azithro",
+  "skill": "regimen",
+  "prompt": "Azithromycin is selected for an adult with pertussis. Which MUMS order and number of 250-mg tablets fit?",
+  "options": [
+   "500 mg day 1, then 250 mg daily days 2–5; 6 tablets",
+   "500 mg day 1, then 250 mg daily days 2–5; 5 tablets",
+   "250 mg BID × 10 days; 20 tablets",
+   "500 mg daily × 5 days; 10 tablets"
+  ],
+  "why": "Two tablets day 1 plus four later tablets gives six; public-health/contact assessment also matters.",
+  "optionRationales": [
+   "Two tablets day 1 plus four later tablets gives six; public-health/contact assessment also matters.",
+   "The loading dose needs two tablets, so five is insufficient.",
+   "This substitutes the clarithromycin-style schedule rather than this azithromycin order.",
+   "This retains the loading dose for every day rather than stepping down."
+  ],
+  "priorId": "thera-exam-20261017-oe-instructions"
+ },
+ {
+  "id": "impetigo-topical-exact",
   "parent": "impetigo-topical",
   "skill": "regimen",
-  "prompt": "A well child has diagnosed localized nonbullous impetigo without cellulitis or an outbreak. Which MUMS treatment fits?",
+  "prompt": "A well child has localized nonbullous impetigo without cellulitis or an outbreak. Mupirocin is selected. Which MUMS order fits?",
   "options": [
-   "Mupirocin 2% thin application TID for 5–7 days",
-   "Mupirocin 2% once weekly for 4 weeks",
-   "Oral plus topical antibiotics for every small lesion",
-   "Valacyclovir 1 g TID for 7 days"
+   "Mupirocin 2% thin application TID × 5–7 days",
+   "Mupirocin 2% thin application BID × 10–14 days",
+   "Mupirocin 1% thin application TID × 5–7 days",
+   "Mupirocin 2% thin application once daily × 5–7 days"
   ],
-  "why": "Limited disease can use this topical regimen. Extensive/systemic/outbreak disease changes selection; an antiviral regimen does not fit the supplied diagnosis."
+  "why": "The cited regimen is 2% applied three times daily for 5–7 days.",
+  "optionRationales": [
+   "The cited regimen is 2% applied three times daily for 5–7 days.",
+   "This changes both the referenced frequency and duration.",
+   "The referenced preparation is 2%, not 1%.",
+   "This reduces the referenced application frequency."
+  ],
+  "priorId": "thera-exam-20261017-impetigo-local"
  },
  {
-  "id": "impetigo-volume",
+  "id": "impetigo-oral-exact",
+  "parent": "impetigo-oral",
+  "skill": "regimen",
+  "prompt": "An adult with extensive impetigo in an outbreak is selected for cephalexin 500 mg per dose and a 7-day course under MUMS. Which complete order fits?",
+  "options": [
+   "500 mg PO QID × 7 days; 28 capsules",
+   "500 mg PO TID × 7 days; 21 capsules",
+   "500 mg PO BID × 7 days; 14 capsules",
+   "500 mg PO QID × 7 days; 21 capsules"
+  ],
+  "why": "QID is the listed frequency; four daily doses for seven days needs 28 capsules.",
+  "optionRationales": [
+   "QID is the listed frequency; four daily doses for seven days needs 28 capsules.",
+   "The quantity matches TID, but the frequency does not match this referenced regimen.",
+   "The quantity matches BID, but the frequency does not match this referenced regimen.",
+   "The directions fit, but the quantity is seven doses short."
+  ],
+  "priorId": "thera-exam-20261017-oe-escalation"
+ },
+ {
+  "id": "impetigo-calc-exact",
   "parent": "impetigo-childcalc",
   "skill": "calculation",
-  "prompt": "A 24-kg child with diagnosed widespread impetigo is prescribed cephalexin 50 mg/kg/DAY divided QID for 7 days. Supplied suspension is 250 mg/5 mL. Which is correct?",
+  "prompt": "A 24-kg child with impetigo is assigned cephalexin 50 mg/kg/DAY divided QID × 7 days. Suspension: 250 mg/5 mL. Which is correct?",
   "options": [
-   "6 mL QID; 168 mL total",
-   "24 mL QID; 672 mL total",
-   "6 mL BID; 84 mL total",
-   "3 mL QID; 84 mL total"
+   "6 mL PO QID; 168 mL",
+   "24 mL PO QID; 672 mL",
+   "6 mL PO BID; 84 mL",
+   "3 mL PO QID; 84 mL"
   ],
-  "why": "1200 mg/day ÷ 4 = 300 mg/dose. At 50 mg/mL this is 6 mL; 6 × 4 × 7 = 168 mL. Use the supplied regimen; do not infer an unstated maximum."
+  "why": "1200 mg/day ÷ 4 = 300 mg/dose; at 50 mg/mL this is 6 mL, 168 mL over 7 days.",
+  "optionRationales": [
+   "1200 mg/day ÷ 4 = 300 mg/dose; at 50 mg/mL this is 6 mL, 168 mL over 7 days.",
+   "This gives the daily amount at each dose.",
+   "This changes QID to BID and halves daily exposure.",
+   "This halves each prescribed dose."
+  ],
+  "priorId": "thera-exam-20261017-impetigo-volume"
  },
  {
-  "id": "cellulitis-course",
+  "id": "cellulitis-cephalexin-exact",
   "parent": "cellulitis-first",
   "skill": "regimen",
-  "prompt": "An adult has diagnosed mild uncomplicated nonpurulent cellulitis, no abscess, no allergy and normal renal function. Which MUMS initial plan fits?",
+  "prompt": "An adult has mild uncomplicated nonpurulent cellulitis, no abscess/allergy and normal renal function. Which initial MUMS cephalexin order fits a responding case?",
   "options": [
-   "Cephalexin 500 mg QID for 5 days, with response-based reassessment",
-   "Cephalexin 500 mg once daily for one day",
-   "Valacyclovir 1 g TID for 7 days",
-   "Cephalexin indefinitely until all discoloration vanishes"
+   "500 mg PO QID × 5 days",
+   "500 mg PO BID × 5 days",
+   "250 mg PO TID × 5 days",
+   "500 mg PO QID × 3 days"
   ],
-  "why": "MUMS supports this initial course for a responding uncomplicated case. Poor response or complexity needs reassessment; residual discoloration does not require indefinite antibiotics."
+  "why": "The referenced initial regimen is 500 mg QID for 5 days, reassessing/extending if clinically needed.",
+  "optionRationales": [
+   "The referenced initial regimen is 500 mg QID for 5 days, reassessing/extending if clinically needed.",
+   "This halves the listed daily amount by changing frequency.",
+   "Neither dose nor frequency matches this listed adult cellulitis order.",
+   "This shortens the cited initial course."
+  ],
+  "priorId": "thera-exam-20261017-cellulitis-course"
  },
  {
-  "id": "abscess",
-  "parent": "cellulitis-abscess",
-  "skill": "treatment-selection",
-  "prompt": "A diagnosed drainable skin abscess has surrounding inflammation. What is the most important management principle?",
+  "id": "cellulitis-quantity-exact",
+  "parent": "cellulitis-first",
+  "skill": "prescription",
+  "prompt": "Cephalexin 500 mg PO QID × 5 days is selected for adult uncomplicated cellulitis. The pharmacy will dispense 250-mg capsules. Which directions and quantity deliver the order?",
   "options": [
-   "Assess drainage/source control and the need for adjunctive antibiotics",
-   "Repeated antibiotic changes without assessing the collection",
-   "Topical steroid alone for the swelling",
-   "A prolonged antibiotic course while deferring source control"
+   "2 capsules QID; 40 capsules",
+   "1 capsule QID; 20 capsules",
+   "2 capsules BID; 20 capsules",
+   "2 capsules QID; 20 capsules"
   ],
-  "why": "Source control may be needed. Site, systemic illness, severity and host risk guide adjunctive antibiotics; drug changes alone may leave the collection untreated."
+  "why": "Each 500-mg dose needs two 250-mg capsules; 2 × 4 × 5 = 40.",
+  "optionRationales": [
+   "Each 500-mg dose needs two 250-mg capsules; 2 × 4 × 5 = 40.",
+   "One capsule supplies only 250 mg per dose.",
+   "This halves the administration frequency.",
+   "The directions fit but the quantity supplies only half the course."
+  ],
+  "priorId": "thera-exam-20261017-eye-review"
  },
  {
-  "id": "mrsa",
-  "parent": "cellulitis-mrsa",
-  "skill": "treatment-selection",
-  "prompt": "A diagnosed skin infection is confirmed to involve MRSA and antibiotics are indicated. Which statement best guides selection?",
+  "id": "bite-amoxclav-exact",
+  "parent": "bite-first",
+  "skill": "regimen",
+  "prompt": "An adult with an infected dog bite has no allergy and normal renal function. A 7-day course using amoxicillin/clavulanate 875/125-mg tablets is chosen. Which MUMS order fits?",
   "options": [
-   "Use a susceptible MRSA-active option; assess drainage and any needed streptococcal coverage",
-   "Assume cephalexin reliably covers MRSA",
-   "Assume amoxicillin reliably covers MRSA",
-   "Use doxycycline in every patient without pregnancy or susceptibility review"
+   "875/125 mg PO BID × 7 days",
+   "875/125 mg PO once daily × 7 days",
+   "500/125 mg PO BID × 7 days",
+   "875/125 mg PO BID × 3 days"
   ],
-  "why": "Cephalexin/amoxicillin are not dependable MRSA therapy. Susceptibility, patient factors and source control matter; no one alternative is universally suitable."
+  "why": "875/125 mg BID is one referenced bite regimen; 7 days is within its infection-treatment range.",
+  "optionRationales": [
+   "875/125 mg BID is one referenced bite regimen; 7 days is within its infection-treatment range.",
+   "Once daily does not match the listed regimen.",
+   "The listed 500/125-mg alternative is TID, not BID.",
+   "This borrows a prophylaxis-length course for established infection."
+  ],
+  "priorId": "thera-exam-20261017-bite-duration"
  },
  {
-  "id": "cellulitis-support",
-  "parent": "cellulitis-nonpharm",
-  "skill": "nonpharm",
-  "prompt": "A patient with diagnosed uncomplicated lower-limb cellulitis and adequate perfusion starts antibiotics. Which accompanying plan is best?",
+  "id": "bite-formulation-exact",
+  "parent": "bite-first",
+  "skill": "regimen",
+  "prompt": "A 7-day course of amoxicillin/clavulanate 500/125 mg is selected for an adult infected bite. Which schedule and quantity match MUMS?",
   "options": [
-   "Elevate as suitable, protect the skin break and document spread/systemic symptoms",
-   "Use antibiotics alone and ignore the portal of entry",
-   "Apply tight occlusion regardless of circulation",
-   "Vigorously massage inflamed tissue"
+   "1 tablet PO TID; 21 tablets",
+   "1 tablet PO BID; 14 tablets",
+   "1 tablet PO QID; 28 tablets",
+   "1 tablet PO TID; 14 tablets"
   ],
-  "why": "Supportive care addresses swelling, skin integrity and monitoring. Treat the portal of entry and recognize progression; care must fit perfusion and the actual wound."
+  "why": "The listed 500/125-mg schedule is TID; 3 × 7 = 21 tablets.",
+  "optionRationales": [
+   "The listed 500/125-mg schedule is TID; 3 × 7 = 21 tablets.",
+   "This borrows the frequency of the different 875/125-mg regimen.",
+   "This increases frequency beyond the listed 500/125-mg regimen.",
+   "The frequency fits but the supply is short."
+  ],
+  "priorId": "thera-exam-20261017-eye-contact"
  },
  {
-  "id": "bite-duration",
+  "id": "bite-duration-exact",
   "parent": "bite-first",
   "skill": "duration",
-  "prompt": "One adult has a high-risk uninfected dog bite selected for prophylaxis; another has an established bite infection. Which MUMS distinction fits?",
+  "prompt": "Using MUMS usual durations, which pair correctly matches high-risk UNINFECTED bite prophylaxis versus established bite-infection treatment?",
   "options": [
-   "Usually 3–5 days prophylaxis versus 7–14 days infection treatment",
-   "Usually 7–14 days prophylaxis versus 1 day infection treatment",
-   "The same single dose regardless of findings",
-   "Antibiotics cannot be used for an infected bite"
+   "3–5 days; 7–14 days",
+   "7–14 days; 3–5 days",
+   "3–5 days; 3–5 days",
+   "7–14 days; 7–14 days"
   ],
-  "why": "Prophylaxis and treatment are separate indications with different usual durations. Depth/response/risk affect the plan; wound and immunization assessment remain necessary."
+  "why": "MUMS separates short prophylaxis from longer treatment; wound depth and response still affect the plan.",
+  "optionRationales": [
+   "MUMS separates short prophylaxis from longer treatment; wound depth and response still affect the plan.",
+   "This reverses prophylaxis and treatment.",
+   "This assigns the prophylaxis duration to established infection.",
+   "This assigns the treatment duration to prophylaxis."
+  ],
+  "priorId": "thera-exam-20261017-aom-prevention"
  },
  {
-  "id": "bite-quantity",
-  "parent": "bite-quantity",
-  "skill": "prescription",
-  "prompt": "For a diagnosed infected bite, amoxicillin/clavulanate 500/125 mg TID for 7 days is selected. Which quantity/formulation statement is correct?",
+  "id": "foot-dual-exact",
+  "parent": "foot-first",
+  "skill": "regimen",
+  "prompt": "A mild, non-limb-threatening diabetic-foot soft-tissue infection is selected for MUMS cephalexin PLUS metronidazole because anaerobic coverage is indicated. A 7-day course is chosen. Which pair fits?",
   "options": [
-   "21 tablets, specifying both components",
-   "14 tablets because every course is BID",
-   "21 tablets labelled only amoxicillin 500 mg",
-   "Use 875/125 with unchanged TID instructions without regimen review"
+   "Cephalexin 500 mg QID + metronidazole 500 mg BID × 7 days",
+   "Cephalexin 500 mg BID + metronidazole 500 mg BID × 7 days",
+   "Cephalexin 500 mg QID + metronidazole 500 mg once daily × 7 days",
+   "Cephalexin 250 mg QID + metronidazole 250 mg BID × 7 days"
   ],
-  "why": "Three daily doses for seven days needs 21 tablets. State both component strengths; changing formulation or frequency requires review rather than a silent substitution."
+  "why": "The cited conditional combination uses cephalexin 500 mg QID and metronidazole 500 mg BID; 7 days is within 1–2 weeks. This is not a universal plan for every foot infection.",
+  "optionRationales": [
+   "The cited conditional combination uses cephalexin 500 mg QID and metronidazole 500 mg BID; 7 days is within 1–2 weeks. This is not a universal plan for every foot infection.",
+   "The cephalexin frequency is halved.",
+   "The metronidazole frequency is halved.",
+   "Both drug doses are halved from this cited combination."
+  ],
+  "priorId": "thera-exam-20261017-sinus-day3"
  },
  {
-  "id": "bite-rabies",
-  "parent": "bite-rabies",
-  "skill": "referral",
-  "prompt": "A bite is being treated. The patient says animal vaccination means no rabies assessment is needed. What is best?",
+  "id": "foot-quantities-exact",
+  "parent": "foot-first",
+  "skill": "calculation",
+  "prompt": "The selected foot-infection order is cephalexin 500 mg QID plus metronidazole 500 mg BID, both for 10 days. Using 500-mg units, which quantities match?",
   "options": [
-   "Use local public-health exposure assessment rather than vaccination history alone",
-   "Accept vaccination history as complete exclusion",
-   "Explain that the bite antibiotic prevents rabies",
-   "Wait for symptoms before assessing prophylaxis"
+   "40 cephalexin capsules + 20 metronidazole tablets",
+   "20 cephalexin capsules + 40 metronidazole tablets",
+   "40 cephalexin capsules + 40 metronidazole tablets",
+   "20 cephalexin capsules + 20 metronidazole tablets"
   ],
-  "why": "Bite antibiotics do not prevent rabies. Public-health assessment uses species, exposure, animal availability and local epidemiology; vaccination history alone is insufficient."
+  "why": "QID × 10 gives 40 cephalexin doses; BID × 10 gives 20 metronidazole doses.",
+  "optionRationales": [
+   "QID × 10 gives 40 cephalexin doses; BID × 10 gives 20 metronidazole doses.",
+   "This reverses the two frequencies.",
+   "This incorrectly applies QID to both drugs.",
+   "This incorrectly applies BID to both drugs."
+  ],
+  "priorId": "thera-exam-20261017-rhinitis-technique"
  },
  {
-  "id": "zoster-order",
+  "id": "zoster-valacyclovir-exact",
   "parent": "zoster-first",
   "skill": "regimen",
-  "prompt": "An adult with diagnosed shingles and normal renal function is selected for MUMS valacyclovir. Which prescription fits?",
+  "prompt": "An adult has shingles with normal renal function and is selected for valacyclovir. Which MUMS order fits?",
   "options": [
-   "1 g PO TID for 7 days; 21 one-gram tablets",
-   "2 g PO BID for one day; 4 one-gram tablets",
-   "1 g PO once daily for 7 days; 7 tablets",
-   "1 g PO TID for 7 days; 7 tablets"
+   "1 g PO TID × 7 days",
+   "1 g PO BID × 7 days",
+   "2 g PO BID × 1 day",
+   "500 mg PO TID × 7 days"
   ],
-  "why": "Shingles uses 1 g TID for 7 days here. The high-dose one-day option is a recurrent herpes-labialis regimen, not shingles; quantity must match directions."
+  "why": "Shingles uses 1 g TID for 7 days in the referenced normal-renal-function regimen.",
+  "optionRationales": [
+   "Shingles uses 1 g TID for 7 days in the referenced normal-renal-function regimen.",
+   "This is not the referenced normal-renal-function shingles frequency.",
+   "This is the recurrent herpes-labialis regimen, not shingles.",
+   "This halves the listed shingles dose."
+  ],
+  "priorId": "thera-exam-20261017-zoster-order"
  },
  {
-  "id": "zoster-renal",
-  "parent": "zoster-renal",
-  "skill": "older-adult",
-  "prompt": "An older adult with diagnosed shingles has reduced renal function and potentially nephrotoxic medicines. A copied valacyclovir order assumes normal renal function. What is best?",
+  "id": "zoster-500mg-exact",
+  "parent": "zoster-first",
+  "skill": "calculation",
+  "prompt": "An adult’s shingles order is valacyclovir 1 g TID × 7 days. Only 500-mg tablets will be dispensed. Which directions/quantity match?",
   "options": [
-   "Apply the verified product-specific renal regimen and review hydration/concomitant risks",
-   "Double the dose solely because of age",
-   "Keep it because treatment lasts only seven days",
-   "Change duration without checking the renal schedule"
+   "2 tablets TID; 42 tablets",
+   "1 tablet TID; 21 tablets",
+   "2 tablets BID; 28 tablets",
+   "2 tablets TID; 21 tablets"
   ],
-  "why": "Reduced clearance affects safety during short courses too. Check the actual adjustment and renal/neurotoxicity risks; age alone neither supplies a dose nor makes the copied order appropriate."
+  "why": "Each 1-g dose requires two tablets; 2 × 3 × 7 = 42.",
+  "optionRationales": [
+   "Each 1-g dose requires two tablets; 2 × 3 × 7 = 42.",
+   "One tablet is only half the ordered dose.",
+   "This reduces the ordered frequency.",
+   "The directions fit but the quantity covers half the course."
+  ],
+  "priorId": "thera-exam-20261017-abscess"
  },
  {
-  "id": "zoster-eye",
-  "parent": "zoster-ocular",
-  "skill": "referral",
-  "prompt": "Diagnosed shingles affects the ophthalmic distribution with eye pain. What is best?",
+  "id": "coldsores-valacyclovir-exact",
+  "parent": "zoster-coldsores",
+  "skill": "regimen",
+  "prompt": "An adult with recurrent herpes labialis and normal renal function starts treatment at prodrome. Which MUMS valacyclovir schedule and 500-mg-tablet quantity fit?",
   "options": [
-   "Urgent eye-capable assessment alongside indicated systemic antiviral management",
-   "Refer only after finishing oral treatment",
-   "Use ocular steroids independently and defer referral",
-   "Treat with skin cream alone"
+   "2 g PO BID for 1 day; 8 tablets",
+   "1 g PO TID for 7 days; 42 tablets",
+   "2 g PO once for 1 day; 4 tablets",
+   "1 g PO BID for 1 day; 4 tablets"
   ],
-  "why": "Ocular involvement changes urgency. Arrange examination while treating systemically as indicated; referral delay and unsupervised ocular steroids are not appropriate substitutes."
+  "why": "Each 2-g dose is four 500-mg tablets; two doses in one day need eight.",
+  "optionRationales": [
+   "Each 2-g dose is four 500-mg tablets; two doses in one day need eight.",
+   "This substitutes the shingles regimen.",
+   "This omits the second 2-g dose.",
+   "This halves each dose."
+  ],
+  "priorId": "thera-exam-20261017-mrsa"
  },
  {
-  "id": "varicella-child",
-  "parent": "varicella-child",
-  "skill": "treatment-selection",
-  "prompt": "A healthy young child has diagnosed uncomplicated chickenpox and drinks well. Which MUMS principle is correct?",
+  "id": "lyme-treatment-exact",
+  "parent": "lyme-treat",
+  "skill": "regimen",
+  "prompt": "A nonpregnant adult has erythema migrans diagnosed as early Lyme disease. Doxycycline is selected. Which MUMS treatment order fits?",
   "options": [
-   "No routine antiviral; provide symptom care and a return plan",
-   "Every child needs the adult shingles regimen",
-   "Antibiotics are needed for every lesion",
-   "Use immune globulin as routine treatment of established chickenpox"
+   "100 mg PO BID × 10 days",
+   "200 mg PO once within 72 hours of tick removal",
+   "100 mg PO once daily × 10 days",
+   "100 mg PO BID × 3 days"
   ],
-  "why": "Routine antiviral treatment is not recommended for uncomplicated disease in otherwise healthy children. High-risk hosts/complications change assessment; prevention and treatment are distinct."
+  "why": "The cited early-Lyme treatment is doxycycline 100 mg BID for 10 days.",
+  "optionRationales": [
+   "The cited early-Lyme treatment is doxycycline 100 mg BID for 10 days.",
+   "This is selected-exposure prophylaxis, not treatment of established erythema migrans.",
+   "This halves the referenced treatment frequency.",
+   "This shortens the referenced treatment course."
+  ],
+  "priorId": "thera-exam-20261017-cellulitis-support"
  },
  {
-  "id": "varicella-preg",
-  "parent": "varicella-preg",
-  "skill": "pregnancy",
-  "prompt": "A susceptible pregnant adult has significant varicella exposure but no rash. Which action fits the reference?",
+  "id": "lyme-amoxicillin-exact",
+  "parent": "lyme-treat",
+  "skill": "regimen",
+  "prompt": "Amoxicillin is selected for an adult with diagnosed early Lyme disease and no allergy or renal impairment. Which MUMS order fits?",
   "options": [
-   "Promptly assess VariZIG eligibility, as soon as possible and within 10 days; avoid live vaccine in pregnancy",
-   "Give live vaccine because exposure cancels its contraindication",
-   "Wait for rash before considering prophylaxis",
-   "Use a healthy child’s symptom-care plan as maternal prophylaxis"
+   "500 mg PO TID × 14 days",
+   "500 mg PO BID × 10 days",
+   "500 mg PO TID × 7 days",
+   "250 mg PO TID × 14 days"
   ],
-  "why": "This is a time-sensitive prevention assessment in a high-risk susceptible person. MUMS identifies immune-globulin assessment; live vaccine is contraindicated and waiting may miss prophylaxis."
+  "why": "The cited alternative is amoxicillin 500 mg TID for 14 days.",
+  "optionRationales": [
+   "The cited alternative is amoxicillin 500 mg TID for 14 days.",
+   "This borrows the adult GAS schedule.",
+   "The frequency/dose fit but the duration is halved.",
+   "This halves the referenced adult dose."
+  ],
+  "priorId": "thera-exam-20261017-bite-quantity"
  },
  {
-  "id": "lice-repeat",
+  "id": "lyme-prophylaxis-exact",
+  "parent": "lyme-prophylaxis",
+  "skill": "regimen",
+  "prompt": "A nonpregnant adult meets all local/MUMS criteria for tick-bite prophylaxis, including vector/endemic exposure, attachment ≥36 hours and timing ≤72 hours after removal. Which regimen matches?",
+  "options": [
+   "Doxycycline 200 mg PO once",
+   "Doxycycline 100 mg PO once",
+   "Doxycycline 100 mg PO BID × 10 days",
+   "Amoxicillin 500 mg PO TID × 14 days"
+  ],
+  "why": "For an eligible exposure, the cited prophylaxis is a single 200-mg dose; current local criteria must be met.",
+  "optionRationales": [
+   "For an eligible exposure, the cited prophylaxis is a single 200-mg dose; current local criteria must be met.",
+   "This halves the specified one-time dose.",
+   "This is an established early-Lyme treatment course, not this prophylaxis schedule.",
+   "This is an established early-Lyme treatment alternative, not the cited prophylaxis regimen."
+  ],
+  "priorId": "thera-exam-20261017-bite-rabies"
+ },
+ {
+  "id": "lice-permethrin-exact",
   "parent": "lice-permethrin",
-  "skill": "education",
-  "prompt": "Head lice are diagnosed and permethrin 1% selected for an eligible child. Which teaching fits the seminar/CPS-linked plan?",
+  "skill": "regimen",
+  "prompt": "For an eligible child with live head lice, which permethrin formulation/contact-time/repeat plan matches the supplied seminar and CPS-linked guidance?",
   "options": [
-   "Follow product directions and repeat in 7–10 days; the seminar uses day 9",
-   "Leave the product on for a week",
-   "Repeat daily until all nits disappear",
-   "Use permethrin 5% with identical hair instructions"
+   "1% rinse, 10 minutes, repeat day 9",
+   "5% cream, 10 minutes, repeat day 9",
+   "1% rinse, 8–14 hours, repeat day 9",
+   "1% rinse, 10 minutes, repeat the next day"
   ],
-  "why": "Use the head-lice formulation and its application directions. The referenced repeat window is 7–10 days; daily retreatment or borrowing scabies instructions can cause misuse."
+  "why": "The seminar uses 1% rinse for 10 minutes, repeated day 9 within the cited 7–10-day window; follow the exact product label.",
+  "optionRationales": [
+   "The seminar uses 1% rinse for 10 minutes, repeated day 9 within the cited 7–10-day window; follow the exact product label.",
+   "5% cream is the scabies preparation, not this head-lice rinse.",
+   "This borrows the scabies contact-time range.",
+   "The next day does not match the referenced repeat interval."
+  ],
+  "priorId": "thera-exam-20261017-lice-repeat"
  },
  {
-  "id": "lice-failure",
-  "parent": "lice-failure",
-  "skill": "followup",
-  "prompt": "Following head-lice treatment, a child still itches and has nits but no live lice are found. What precedes declaring resistance?",
-  "options": [
-   "Recheck for live lice and review application/repeat timing",
-   "Escalate because any nit proves resistance",
-   "Apply treatment daily for two weeks",
-   "Treat everyone automatically without assessment"
-  ],
-  "why": "Itch/nits alone do not establish active treatment failure. Confirm live infestation and correct treatment use before changing products or treating contacts unnecessarily."
- },
- {
-  "id": "scabies",
+  "id": "scabies-permethrin-exact",
   "parent": "lice-scabies",
   "skill": "regimen",
-  "prompt": "An adult has diagnosed scabies. Which permethrin regimen distinguishes it from head-lice treatment?",
+  "prompt": "For an eligible adult with scabies, which permethrin plan matches the linked reference?",
   "options": [
-   "5% cream to appropriate whole-body sites, generally neck down, left 8–14 hours; repeat about a week later when indicated",
-   "1% hair rinse for 10 minutes as the sole whole-body treatment",
-   "5% cream on visible spots only for 5 minutes",
-   "1% rinse daily indefinitely"
+   "5% cream to appropriate whole-body sites, 8–14 hours, repeat about 1 week later if indicated",
+   "1% rinse to appropriate whole-body sites, 8–14 hours, repeat about 1 week later",
+   "5% cream on visible lesions only, 8–14 hours, repeat about 1 week later",
+   "5% cream to appropriate whole-body sites, 10 minutes, repeat about 1 week later"
   ],
-  "why": "Scabies needs the correct whole-body product/time, not head-lice or spot-treatment instructions. Age/head/face directions and coordinated contact management need separate attention."
+  "why": "Use 5% cream on the indicated whole-body sites, generally neck down in adults, for 8–14 hours; coordinate contact treatment.",
+  "optionRationales": [
+   "Use 5% cream on the indicated whole-body sites, generally neck down in adults, for 8–14 hours; coordinate contact treatment.",
+   "This substitutes the lice concentration/formulation.",
+   "Spot treatment misses the required application distribution.",
+   "This borrows the lice rinse contact time."
+  ],
+  "priorId": "thera-exam-20261017-scabies"
  },
  {
-  "id": "acne-preg",
+  "id": "acne-adapalene-exact",
+  "parent": "acne-judith",
+  "skill": "regimen",
+  "prompt": "Adapalene 0.1% is selected for a nonpregnant patient’s acne. Which application schedule and initial review interval fit the seminar?",
+  "options": [
+   "Thin film to acne-prone affected areas nightly; review about 4–8 weeks",
+   "Thin film to individual visible lesions nightly; review about 4–8 weeks",
+   "Thin film to acne-prone areas TID; review about 4–8 weeks",
+   "Thin film to acne-prone areas nightly; stop after a fixed 5-day course"
+  ],
+  "why": "The seminar uses nightly application to the affected acne-prone area, not only spot treatment; assess tolerability/response around 4–8 weeks.",
+  "optionRationales": [
+   "The seminar uses nightly application to the affected acne-prone area, not only spot treatment; assess tolerability/response around 4–8 weeks.",
+   "Spot-only application does not match the field-treatment directions.",
+   "TID does not match the referenced application frequency and can worsen irritation.",
+   "Acne therapy/maintenance is not an acute 5-day antibiotic-style course."
+  ],
+  "priorId": "thera-exam-20261017-zoster-renal"
+ },
+ {
+  "id": "acne-doxy-duration",
+  "parent": "acne-gerry",
+  "skill": "duration",
+  "prompt": "Doxycycline 100 mg PO daily is selected for inflammatory acne with a suitable topical plan. Which duration strategy matches the linked study guidance?",
+  "options": [
+   "Review response and tolerability; limit systemic therapy, commonly about 3–4 months",
+   "Use exactly 5 days, matching uncomplicated cellulitis",
+   "Use exactly 10 days, matching GAS",
+   "Maintain the antibiotic as the sole treatment for 12 months before review"
+  ],
+  "why": "Acne systemic antibiotic therapy is reviewed and limited, commonly about 3–4 months, with appropriate topical treatment; not every patient needs the same fixed duration.",
+  "optionRationales": [
+   "Acne systemic antibiotic therapy is reviewed and limited, commonly about 3–4 months, with appropriate topical treatment; not every patient needs the same fixed duration.",
+   "This imports an acute skin-infection course into acne management.",
+   "This imports a throat-infection course into acne management.",
+   "This omits timely review and suitable concurrent/maintenance topical therapy."
+  ],
+  "priorId": "thera-exam-20261017-zoster-eye"
+ },
+ {
+  "id": "acne-pregnancy-set",
   "parent": "acne-preg",
   "skill": "pregnancy",
-  "prompt": "A pregnant adult has diagnosed acne. Which option is the most appropriate direction?",
+  "prompt": "Which acne plan best fits a pregnant patient after formulation and individual-risk review?",
   "options": [
-   "Discuss pregnancy-compatible options such as azelaic acid after product/patient review",
-   "Restart adapalene because every topical drug is risk-free",
-   "Use oral isotretinoin at a lower dose",
-   "Choose routine doxycycline as preferred pregnancy therapy"
+   "Consider azelaic acid; avoid adapalene, oral isotretinoin and routine doxycycline",
+   "Consider adapalene; avoid azelaic acid, oral isotretinoin and routine doxycycline",
+   "Consider doxycycline; avoid azelaic acid, adapalene and oral isotretinoin",
+   "Consider oral isotretinoin; avoid azelaic acid, adapalene and doxycycline"
   ],
-  "why": "Linked pregnancy guidance distinguishes suitable options from retinoids and routine doxycycline. Formulation and individual risk still need review; lowering a retinoid dose does not eliminate this concern."
+  "why": "The linked pregnancy guidance supports discussion of azelaic acid; the named retinoids and routine doxycycline should be avoided here.",
+  "optionRationales": [
+   "The linked pregnancy guidance supports discussion of azelaic acid; the named retinoids and routine doxycycline should be avoided here.",
+   "This reverses the azelaic-acid/retinoid distinction.",
+   "This selects routine doxycycline for pregnancy acne.",
+   "This selects a contraindicated systemic retinoid."
+  ],
+  "priorId": "thera-exam-20261017-acne-preg"
  },
  {
-  "id": "acne-doxy",
-  "parent": "acne-doxy",
-  "skill": "education",
-  "prompt": "Doxycycline is selected for a nonpregnant adult with diagnosed inflammatory acne. Which teaching best reduces avoidable harms?",
+  "id": "eczema-ftu-calc",
+  "parent": "eczema-ftu",
+  "skill": "calculation",
+  "prompt": "A supplied ADULT eczema plan specifies 2 fingertip units per application, 0.5 g/FTU, BID × 7 days. Excluding package allowance, what quantity is needed?",
   "options": [
-   "Adequate water, remain upright, sun protection and review iron/antacid interactions",
-   "Take immediately before lying down without water",
-   "Take simultaneously with iron to improve absorption",
-   "Ignore pregnancy plans because the indication is acne"
+   "14 g",
+   "7 g",
+   "28 g",
+   "3.5 g"
   ],
-  "why": "Water/upright administration addresses esophageal injury; sun protection addresses photosensitivity, and mineral interactions need review. Patient factors remain relevant for acne therapy."
+  "why": "2 × 0.5 = 1 g/application; 1 × 2 × 7 = 14 g. These supplied adult FTU assumptions must not be transferred to an infant.",
+  "optionRationales": [
+   "2 × 0.5 = 1 g/application; 1 × 2 × 7 = 14 g. These supplied adult FTU assumptions must not be transferred to an infant.",
+   "This counts only one daily application.",
+   "This treats each FTU as 1 g rather than the supplied 0.5 g.",
+   "This halves the amount/application and omits the second daily application."
+  ],
+  "priorId": "thera-exam-20261017-varicella-child"
  },
  {
-  "id": "eczema-site",
-  "parent": "eczema-potency",
-  "skill": "safety",
-  "prompt": "An infant has diagnosed facial eczema. Which topical-steroid principle is best?",
+  "id": "fever-concentration-calc",
+  "parent": "fever-concentration",
+  "skill": "calculation",
+  "prompt": "A child’s selected acetaminophen dose is 160 mg. The new bottle is 160 mg/5 mL; the previous bottle was 80 mg/mL. Which new volume delivers the selected dose?",
   "options": [
-   "Age/site-appropriate potency, amount and short duration with emollient care",
-   "Largest percentage always means strongest product",
-   "Copy adult high-potency treatment under occlusion",
-   "Continue any topical steroid indefinitely"
+   "5 mL",
+   "2 mL",
+   "1 mL",
+   "10 mL"
   ],
-  "why": "Young age, thin skin and occlusion affect absorption/harm. Percentages cannot compare potency across molecules; specify product, site, amount, frequency and duration instead of copying an adult plan."
+  "why": "160 mg ÷ 32 mg/mL = 5 mL. The selected mg dose is supplied; this does not establish its suitability for an unspecified child.",
+  "optionRationales": [
+   "160 mg ÷ 32 mg/mL = 5 mL. The selected mg dose is supplied; this does not establish its suitability for an unspecified child.",
+   "2 mL was correct for the old 80-mg/mL bottle, not the new bottle.",
+   "1 mL of the new product supplies only 32 mg.",
+   "10 mL supplies 320 mg, twice the selected dose."
+  ],
+  "priorId": "thera-exam-20261017-varicella-preg"
+ },
+ {
+  "id": "sinus-child-calc",
+  "parent": "sinusitis-child",
+  "skill": "calculation",
+  "prompt": "A 15-kg child with bacterial sinusitis is prescribed amoxicillin 80 mg/kg/DAY divided BID × 10 days. Suspension: 400 mg/5 mL. Which dose and quantity match?",
+  "options": [
+   "7.5 mL BID; 150 mL",
+   "15 mL BID; 300 mL",
+   "7.5 mL TID; 225 mL",
+   "3.75 mL BID; 75 mL"
+  ],
+  "why": "1200 mg/day ÷ 2 = 600 mg/dose; divide by 80 mg/mL for 7.5 mL. Twenty doses need 150 mL.",
+  "optionRationales": [
+   "1200 mg/day ÷ 2 = 600 mg/dose; divide by 80 mg/mL for 7.5 mL. Twenty doses need 150 mL.",
+   "This gives the daily amount at each dose.",
+   "This increases the prescribed frequency to TID without reducing the dose.",
+   "This halves the prescribed dose."
+  ],
+  "priorId": "thera-exam-20261017-lice-failure"
+ },
+ {
+  "id": "gas-lactation-exact",
+  "parent": "gas-preg",
+  "skill": "lactation",
+  "prompt": "Amoxicillin is selected for GAS in a breastfeeding adult, with no allergy or renal impairment. Which order AND infant-monitoring set match the linked sources?",
+  "options": [
+   "500 mg PO BID × 10 days; monitor infant diarrhea, rash or thrush",
+   "500 mg PO TID × 5 days; monitor infant diarrhea, rash or thrush",
+   "500 mg PO BID × 10 days; interrupt all breastfeeding throughout therapy",
+   "250 mg PO BID × 10 days; monitor infant diarrhea, rash or thrush"
+  ],
+  "why": "This matches the adult GAS course and linked lactation monitoring; routine breastfeeding interruption is not required.",
+  "optionRationales": [
+   "This matches the adult GAS course and linked lactation monitoring; routine breastfeeding interruption is not required.",
+   "The monitoring fits but the adult GAS regimen does not.",
+   "The course fits but automatic interruption is not the linked routine advice.",
+   "This halves the referenced adult dose."
+  ],
+  "priorId": "thera-exam-20261017-gas-lactation"
+ },
+ {
+  "id": "zoster-coldsores-pair",
+  "parent": "zoster-coldsores",
+  "skill": "regimen",
+  "prompt": "Match normal-renal-function valacyclovir regimens for SHINGLES versus recurrent HERPES LABIALIS started at prodrome.",
+  "options": [
+   "1 g TID × 7 days; 2 g BID × 1 day",
+   "2 g BID × 1 day; 1 g TID × 7 days",
+   "1 g BID × 7 days; 2 g once × 1 day",
+   "500 mg TID × 7 days; 1 g BID × 1 day"
+  ],
+  "why": "The indication changes both dose and duration: shingles 1 g TID for 7 days; recurrent cold sores 2 g BID for one day.",
+  "optionRationales": [
+   "The indication changes both dose and duration: shingles 1 g TID for 7 days; recurrent cold sores 2 g BID for one day.",
+   "This reverses the indication-specific regimens.",
+   "Both schedules understate one aspect of the referenced regimen.",
+   "This halves both referenced per-dose amounts."
+  ],
+  "priorId": "thera-exam-20261017-acne-doxy"
+ },
+ {
+  "id": "impetigo-varicella-exact",
+  "parent": "varicella-secondary",
+  "skill": "regimen",
+  "prompt": "A child with chickenpox develops two localized impetigo lesions, without cellulitis/systemic illness. Mupirocin is selected for the SECONDARY bacterial infection. Which regimen fits MUMS?",
+  "options": [
+   "2% topical thin application TID × 5–7 days",
+   "2% topical thin application once daily × 5–7 days",
+   "1% topical thin application TID × 5–7 days",
+   "2% topical thin application TID × 14 days"
+  ],
+  "why": "Treat the separate localized impetigo indication with the cited 2% TID 5–7-day regimen, not the underlying virus.",
+  "optionRationales": [
+   "Treat the separate localized impetigo indication with the cited 2% TID 5–7-day regimen, not the underlying virus.",
+   "This reduces the referenced frequency.",
+   "This substitutes an incorrect concentration for the referenced preparation.",
+   "This prolongs the referenced uncomplicated localized course."
+  ],
+  "priorId": "thera-exam-20261017-eczema-site"
+ },
+ {
+  "id": "org-aom",
+  "parent": "aom-three",
+  "skill": "organism",
+  "prompt": "Which set contains the THREE usual major bacterial causes of pediatric AOM?",
+  "options": [
+   "Streptococcus pneumoniae; nontypeable Haemophilus influenzae; Moraxella catarrhalis",
+   "Streptococcus pneumoniae; Staphylococcus aureus; Moraxella catarrhalis",
+   "Pseudomonas aeruginosa; nontypeable Haemophilus influenzae; Staphylococcus aureus",
+   "Streptococcus pyogenes; Haemophilus influenzae type b; Moraxella catarrhalis"
+  ],
+  "why": "The usual major trio is pneumococcus, nontypeable Haemophilus influenzae and Moraxella catarrhalis; this is not a claim that other causes never occur.",
+  "optionRationales": [
+   "The usual major trio is pneumococcus, nontypeable Haemophilus influenzae and Moraxella catarrhalis; this is not a claim that other causes never occur.",
+   "Staphylococcus aureus replaces nontypeable Haemophilus influenzae in this distractor.",
+   "Pseudomonas/Staphylococcus aureus suggest external-canal organisms rather than the usual AOM trio.",
+   "This swaps pneumococcus for GAS and nontypeable Haemophilus influenzae for type b."
+  ],
+  "organismParent": true
+ },
+ {
+  "id": "org-oe",
+  "parent": "external-middle",
+  "skill": "organism",
+  "prompt": "Which pair best matches common bacterial causes of acute otitis externa?",
+  "options": [
+   "Pseudomonas aeruginosa + Staphylococcus aureus",
+   "Streptococcus pneumoniae + Moraxella catarrhalis",
+   "Nontypeable Haemophilus influenzae + Streptococcus pneumoniae",
+   "Streptococcus pyogenes + Pasteurella multocida"
+  ],
+  "why": "Pseudomonas and Staphylococcus aureus are the important usual external-canal pair.",
+  "optionRationales": [
+   "Pseudomonas and Staphylococcus aureus are the important usual external-canal pair.",
+   "This pair belongs to the common middle-ear/respiratory pathogen group.",
+   "This pair also fits middle-ear pathogens better than the usual OE pair.",
+   "GAS/Pasteurella is not the usual external-canal pair; Pasteurella is an exposure clue for animal bites."
+  ],
+  "organismParent": true
+ },
+ {
+  "id": "org-eye-child",
+  "parent": "eye-age",
+  "skill": "organism",
+  "prompt": "For ordinary pediatric BACTERIAL conjunctivitis, which set contains the three key respiratory-associated causes in the linked study reference?",
+  "options": [
+   "Haemophilus influenzae; Streptococcus pneumoniae; Moraxella catarrhalis",
+   "Haemophilus influenzae; Streptococcus pyogenes; Pseudomonas aeruginosa",
+   "Staphylococcus aureus; Pasteurella multocida; Moraxella catarrhalis",
+   "Streptococcus agalactiae; Streptococcus pneumoniae; Bordetella pertussis"
+  ],
+  "why": "The linked pediatric list includes Haemophilus influenzae, pneumococcus and Moraxella catarrhalis; age does not identify a patient’s organism with certainty.",
+  "optionRationales": [
+   "The linked pediatric list includes Haemophilus influenzae, pneumococcus and Moraxella catarrhalis; age does not identify a patient’s organism with certainty.",
+   "This swaps in GAS and Pseudomonas instead of the named pediatric trio.",
+   "Pasteurella is an animal-bite clue, not part of this usual pediatric set.",
+   "GBS and pertussis are not the usual pediatric conjunctivitis set."
+  ],
+  "organismParent": true
+ },
+ {
+  "id": "org-eye-adult",
+  "parent": "eye-age",
+  "skill": "organism",
+  "prompt": "Which adult-versus-child bacterial conjunctivitis pairing best matches the linked reference?",
+  "options": [
+   "Adults: staphylococci prominent; children: Haemophilus influenzae, Streptococcus pneumoniae, Moraxella catarrhalis important",
+   "Adults: Haemophilus influenzae prominent; children: Pasteurella multocida, Streptococcus agalactiae, Bordetella pertussis important",
+   "Adults: Pseudomonas aeruginosa prominent in all cases; children: staphylococci only",
+   "Adults: Streptococcus pyogenes prominent; children: Haemophilus influenzae type b only"
+  ],
+  "why": "Staphylococci are prominent in adult bacterial disease; the respiratory-associated organisms are important in children. These are probabilities, not exclusive age rules.",
+  "optionRationales": [
+   "Staphylococci are prominent in adult bacterial disease; the respiratory-associated organisms are important in children. These are probabilities, not exclusive age rules.",
+   "This replaces the pediatric list with organisms not representing that usual pattern.",
+   "This overgeneralizes Pseudomonas and makes the pediatric causes artificially exclusive.",
+   "This overstates GAS in adults and confuses nontypeable Haemophilus influenzae with type b."
+  ],
+  "organismParent": true
+ },
+ {
+  "id": "org-sinus",
+  "parent": "sinus-bacteria",
+  "skill": "organism",
+  "prompt": "Which set best matches the usual bacterial targets in uncomplicated acute bacterial sinusitis?",
+  "options": [
+   "Streptococcus pneumoniae; Haemophilus influenzae; Moraxella catarrhalis",
+   "Streptococcus pneumoniae; Pseudomonas aeruginosa; Staphylococcus aureus",
+   "Streptococcus pyogenes; Bordetella pertussis; Haemophilus influenzae",
+   "Pasteurella multocida; Staphylococcus aureus; Moraxella catarrhalis"
+  ],
+  "why": "The usual empirical targets are pneumococcus, Haemophilus influenzae and Moraxella catarrhalis; this is not an exhaustive list for every special host/exposure.",
+  "optionRationales": [
+   "The usual empirical targets are pneumococcus, Haemophilus influenzae and Moraxella catarrhalis; this is not an exhaustive list for every special host/exposure.",
+   "Pseudomonas/Staphylococcus aureus do not replace the usual uncomplicated trio.",
+   "GAS/pertussis do not form the standard uncomplicated sinusitis trio.",
+   "Pasteurella points toward animal-bite exposure rather than ordinary sinusitis."
+  ],
+  "organismParent": true
+ },
+ {
+  "id": "org-impetigo",
+  "parent": "impetigo-forms",
+  "skill": "organism",
+  "prompt": "Which pairing correctly identifies NONBULLOUS impetigo causes versus the toxin-producing cause of BULLOUS impetigo?",
+  "options": [
+   "Nonbullous: Staphylococcus aureus and/or Streptococcus pyogenes; bullous: Staphylococcus aureus",
+   "Nonbullous: Staphylococcus aureus and/or Streptococcus pyogenes; bullous: Streptococcus pyogenes",
+   "Nonbullous: Streptococcus pneumoniae and/or Streptococcus pyogenes; bullous: Staphylococcus aureus",
+   "Nonbullous: Staphylococcus aureus and/or Streptococcus agalactiae; bullous: Streptococcus agalactiae"
+  ],
+  "why": "Nonbullous disease can involve Staphylococcus aureus, GAS or both; bullous disease is linked to toxin-producing Staphylococcus aureus.",
+  "optionRationales": [
+   "Nonbullous disease can involve Staphylococcus aureus, GAS or both; bullous disease is linked to toxin-producing Staphylococcus aureus.",
+   "The nonbullous pair fits but the bullous organism is wrong.",
+   "This swaps in pneumococcus for Staphylococcus aureus in the nonbullous set.",
+   "This substitutes GBS for GAS and incorrectly assigns it to bullous disease."
+  ],
+  "organismParent": true
+ },
+ {
+  "id": "org-purulence",
+  "parent": "purulent",
+  "skill": "organism",
+  "prompt": "Which organism emphasis best distinguishes typical NONPURULENT cellulitis from a PURULENT skin abscess?",
+  "options": [
+   "Nonpurulent: beta-hemolytic streptococci; abscess: Staphylococcus aureus, including MRSA when relevant",
+   "Nonpurulent: Staphylococcus aureus only; abscess: beta-hemolytic streptococci only",
+   "Nonpurulent: Pseudomonas aeruginosa; abscess: Streptococcus pneumoniae",
+   "Nonpurulent: Pasteurella multocida; abscess: Moraxella catarrhalis"
+  ],
+  "why": "The syndrome shifts probability toward streptococci in ordinary nonpurulent disease and Staphylococcus aureus in abscesses; assess source control and local MRSA context.",
+  "optionRationales": [
+   "The syndrome shifts probability toward streptococci in ordinary nonpurulent disease and Staphylococcus aureus in abscesses; assess source control and local MRSA context.",
+   "This reverses the useful syndrome emphasis and makes it exclusive.",
+   "This pair does not match the usual uncomplicated skin-syndrome distinction.",
+   "This assigns bite/respiratory organisms to the usual skin-syndrome pair."
+  ],
+  "organismParent": true
+ },
+ {
+  "id": "org-bite",
+  "parent": "bite-pasteurella",
+  "skill": "organism",
+  "prompt": "Which organism most directly explains why an infected cat/dog bite cannot simply inherit a cephalexin-only routine cellulitis plan?",
+  "options": [
+   "Pasteurella multocida",
+   "Streptococcus pyogenes",
+   "Staphylococcus aureus",
+   "Streptococcus pneumoniae"
+  ],
+  "why": "Pasteurella is an important bite-associated gap; bites can also require other aerobic/anaerobic coverage, so this is not a claim of monomicrobial infection.",
+  "optionRationales": [
+   "Pasteurella is an important bite-associated gap; bites can also require other aerobic/anaerobic coverage, so this is not a claim of monomicrobial infection.",
+   "GAS can be relevant to skin infection but does not explain the key bite-associated coverage gap asked here.",
+   "Staphylococcus aureus can occur in wounds but is not the distinctive bite-associated answer in this question.",
+   "Pneumococcus is not the key animal-bite organism in this distinction."
+  ],
+  "organismParent": true
+ },
+ {
+  "id": "org-gas-gbs",
+  "parent": "gas-name",
+  "skill": "organism",
+  "prompt": "Which GAS-pharyngitis versus pregnancy-screening GBS organism pair is correct?",
+  "options": [
+   "GAS: Streptococcus pyogenes; GBS: Streptococcus agalactiae",
+   "GAS: Streptococcus agalactiae; GBS: Streptococcus pyogenes",
+   "GAS: Streptococcus pneumoniae; GBS: Streptococcus agalactiae",
+   "GAS: Staphylococcus aureus; GBS: Streptococcus pyogenes"
+  ],
+  "why": "GAS corresponds to Streptococcus pyogenes; GBS commonly corresponds to Streptococcus agalactiae.",
+  "optionRationales": [
+   "GAS corresponds to Streptococcus pyogenes; GBS commonly corresponds to Streptococcus agalactiae.",
+   "This reverses the two organisms.",
+   "Pneumococcus is not group A streptococcus.",
+   "Staphylococcus aureus is a staphylococcus; Streptococcus pyogenes is GAS, not GBS."
+  ],
+  "organismParent": true
+ },
+ {
+  "id": "org-pertussis",
+  "parent": "pertussis-name",
+  "skill": "organism",
+  "prompt": "Which organism causes pertussis?",
+  "options": [
+   "Bordetella pertussis",
+   "Haemophilus influenzae",
+   "Moraxella catarrhalis",
+   "Streptococcus pneumoniae"
+  ],
+  "why": "Bordetella pertussis causes pertussis; integrate age, severity and public-health/contact management.",
+  "optionRationales": [
+   "Bordetella pertussis causes pertussis; integrate age, severity and public-health/contact management.",
+   "Haemophilus influenzae belongs to other respiratory/middle-ear pathogen lists, not the pertussis cause.",
+   "Moraxella catarrhalis is not the pertussis organism.",
+   "Pneumococcus is not the pertussis organism."
+  ],
+  "organismParent": true
+ },
+ {
+  "id": "org-skin-viruses",
+  "parent": "viral-skin",
+  "skill": "organism",
+  "prompt": "Which CHICKENPOX / SHINGLES / usual COLD-SORE organism sequence is correct?",
+  "options": [
+   "Varicella-zoster virus / varicella-zoster virus / herpes simplex virus",
+   "Herpes simplex virus / varicella-zoster virus / varicella-zoster virus",
+   "Varicella-zoster virus / herpes simplex virus / herpes simplex virus",
+   "Herpes simplex virus / herpes simplex virus / varicella-zoster virus"
+  ],
+  "why": "Chickenpox and shingles are both VZV; cold sores are usually HSV. Antibacterials need a separate bacterial indication.",
+  "optionRationales": [
+   "Chickenpox and shingles are both VZV; cold sores are usually HSV. Antibacterials need a separate bacterial indication.",
+   "This misassigns chickenpox and usual cold sores.",
+   "This misassigns shingles to HSV.",
+   "This misassigns all three conditions."
+  ],
+  "organismParent": true
+ },
+ {
+  "id": "org-scabies",
+  "parent": "parasites",
+  "skill": "organism",
+  "prompt": "Which causal-class pairing correctly distinguishes HEAD LICE from SCABIES?",
+  "options": [
+   "Head lice: insects; scabies: Sarcoptes scabiei mites",
+   "Head lice: Sarcoptes scabiei mites; scabies: insects",
+   "Head lice: insects; scabies: dermatophyte fungi",
+   "Head lice: dermatophyte fungi; scabies: Sarcoptes scabiei mites"
+  ],
+  "why": "Lice are insects; scabies is caused by the mite S. scabiei. The difference also matters for product concentration and application.",
+  "optionRationales": [
+   "Lice are insects; scabies is caused by the mite S. scabiei. The difference also matters for product concentration and application.",
+   "This reverses lice and mite infestations.",
+   "Scabies is a mite infestation, not a dermatophyte infection.",
+   "Head lice are insects, not fungi."
+  ],
+  "organismParent": true
  }
 ];
 const THERA_EXAM_CHALLENGES=THERA_EXAM_ROWS.map(row=>{
- const foundation=['framework','cno'].includes(row.parent);
- const ref=foundation?null:MIDTERM_RECALL.find(q=>q.id==='recall-20261016-'+row.parent);
- if(!foundation&&!ref)throw Error('Missing THERA source parent '+row.parent);
- return {id:'thera-exam-20261017-'+row.id,course:'Thera',condition:ref?.condition||'prescribing',system:ref?.system||'foundations',module:ref?.module||'thera-1',topic:ref?.topic||'Safe prescribing',prompt:row.prompt,options:row.options,answer:0,explanation:row.why,sources:ref?[...ref.sources]:row.parent==='framework'?['theraFoundations']:row.id==='consult'?['cnoNPFAQ']:['cnoNPOct2026'],sourceNote:(ref?.sourceNote||(row.parent==='framework'?'THERA 1.docx, blocks 353–368.':'Linked CNO standard/FAQ, checked October 17, 2026.'))+' Original study question, not an instructor item or marking key. Diagnosis supplied; no organism recall required.',practiceLabel:'THERA exam-style MCQ · October 17, 2026',drillGroup:'theraExamChallenge',examSkill:row.skill};
+ const id=(row.organismParent?'organism-age-20261016-':'recall-20261016-')+row.parent;
+ const ref=MIDTERM_RECALL.find(q=>q.id===id);
+ if(!ref)throw Error('Missing source parent '+id);
+ return {id:row.priorId||'thera-hard-20261017-'+row.id,course:'Thera',condition:ref.condition,system:ref.system,module:ref.module,topic:ref.topic,prompt:row.prompt,options:row.options,answer:0,explanation:row.why,optionRationales:row.optionRationales,sources:[...ref.sources],sourceNote:ref.sourceNote+' Original difficult practice item; answer tied to the named source. Distractors are intentionally incorrect in the stated scenario, not alternative instructions to follow.',practiceLabel:row.organismParent?'Organism-set MCQ · extra integrated recall; not a new THERA exam requirement':'Exact-regimen MCQ · diagnosis supplied',drillGroup:'theraExamChallenge',examSkill:row.skill};
 });
 PRACTICE.push(...THERA_EXAM_CHALLENGES);
