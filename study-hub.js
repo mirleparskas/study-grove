@@ -4,11 +4,12 @@ function recallIdsForCase(c){
  if(!c.specific)return base;
  return [...c.specific.map(s=>MIDTERM_RECALL.find(q=>q.id==='recall-20261016-'+s)),...base.filter(q=>!c.specific.some(s=>q.id==='recall-20261016-'+s)&&['nonpharm','followup','recommendation','organism','age','goals','education'].includes(q.type))].filter(Boolean);
 }
-function hubTabs(course,selected){const route=course==='Thera'?'thera-study':'ahad-study';return `<nav class="hub-tabs" aria-label="${course} study sections">${[['questions','Recall questions'],...(course==='Thera'?[['cases','Seminar cases']]:[]),['treatments',course==='Thera'?'Drug & duration review':'Module 5 cardiology'],['guide','Exam guide'],['practice',course==='AHAD'?'MCQ practice & Anki':'MCQs & writing']].map(([id,label])=>`<a class="button ${id===selected?'primary':''}" ${id===selected?'aria-current="page"':''} href="#${route}/${id}">${label}</a>`).join('')}</nav>`;}
+function hubTabs(course,selected){const route=course==='Thera'?'thera-study':'ahad-study';return `<nav class="hub-tabs" aria-label="${course} study sections">${[['questions','Recall questions'],...(course==='Thera'?[['cases','Seminar cases'],['antibiotics','Antibiotic groups']]:[]),['treatments',course==='Thera'?'Drug & duration review':'Module 5 cardiology'],['guide','Exam guide'],['practice',course==='AHAD'?'MCQ practice & Anki':'MCQs & writing']].map(([id,label])=>`<a class="button ${id===selected?'primary':''}" ${id===selected?'aria-current="page"':''} href="#${route}/${id}">${label}</a>`).join('')}</nav>`;}
 function studyHub(route,arg,params){
  const course=route==='thera-study'?'Thera':'AHAD',tab=arg||'questions';
  $('#main').innerHTML=header(course==='Thera'?'THERA midterm study':'AHAD midterm study',course==='Thera'?'Recall the treatment. Explain why. Change the plan when the patient changes.':'Modules 1–5, including Cardiology I in Module 5. Recognize findings, compare diagnoses and choose the next step.','MIDTERM STUDY')+hubTabs(course,tab)+'<div id="hub-content"></div>';
  if(tab==='cases'&&course==='Thera')caseReviewHub(params.get('case'));
+ else if(tab==='antibiotics'&&course==='Thera')antibioticGroups(params);
  else if(tab==='treatments')course==='Thera'?treatmentReview():cardiologyReview();
  else if(tab==='guide'){
   const shell=$('#main').innerHTML;midtermPlan(course);const plan=$('#main').innerHTML;
