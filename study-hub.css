@@ -12,3 +12,7 @@
 .abx-source{font-size:12px;margin-top:14px}
 .abx-source summary{cursor:pointer;color:#355d48;font-weight:600}
 @media(max-width:700px){.abx-table,.abx-table tbody,.abx-table tr,.abx-table td{display:block;width:100%}.abx-table thead{display:none}.abx-table tr{padding:8px 0 14px;border-bottom:2px solid #dce5dc}.abx-table td{border:0;padding:10px 4px}.abx-table td:nth-child(2)::before{content:'Regimen';display:block;font-size:12px;font-weight:700;color:#577461;margin-bottom:7px}.abx-table td:nth-child(3)::before{content:'Key distinction';display:block;font-size:12px;font-weight:700;color:#577461;margin-bottom:7px}}
+
+.supplied-case-stem,.supplied-case-answer{margin-top:18px;min-width:0;overflow-wrap:anywhere}.supplied-case-answer summary{cursor:pointer;color:var(--green);font-weight:600}.supplied-case-answer li{margin:9px 0}
+
+.mcq-case-context{margin:18px 0;padding:16px;background:var(--cream);border:1px solid var(--line);border-radius:9px;font-size:14px;overflow-wrap:anywhere}.mcq-case-context summary{cursor:pointer;font-weight:700;color:var(--green)}.mcq-case-context p{white-space:pre-line}

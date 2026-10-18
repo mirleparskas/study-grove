@@ -1,6 +1,6 @@
 # Study Grove Anki midterm deck
 
-464 cards: 139 focused recall cards and 205 clinical application cards and 120 exam-style MCQs (60 THERA and 60 AHAD).
+605 cards: 139 focused recall cards and 256 clinical application cards and 210 exam-style MCQs (60 THERA and 150 AHAD).
 
 ## Import on your Mac
 
