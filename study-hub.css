@@ -16,3 +16,5 @@
 .supplied-case-stem,.supplied-case-answer{margin-top:18px;min-width:0;overflow-wrap:anywhere}.supplied-case-answer summary{cursor:pointer;color:var(--green);font-weight:600}.supplied-case-answer li{margin:9px 0}
 
 .mcq-case-context{margin:18px 0;padding:16px;background:var(--cream);border:1px solid var(--line);border-radius:9px;font-size:14px;overflow-wrap:anywhere}.mcq-case-context summary{cursor:pointer;font-weight:700;color:var(--green)}.mcq-case-context p{white-space:pre-line}
+
+.classmate-answer,.classmate-source{overflow-wrap:anywhere;min-width:0}.classmate-answer img,.recall-card h2 img{max-width:100%;height:auto}.classmate-answer table{display:block;max-width:100%;overflow-x:auto}.classmate-source details{margin:16px 0}.cloze{font-weight:700;color:var(--green)}

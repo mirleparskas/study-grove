@@ -1,6 +1,8 @@
 # Study Grove Anki midterm deck
 
-682 cards: 139 focused recall cards and 262 clinical application cards and 281 exam-style MCQs (85 THERA and 196 AHAD).
+1393 cards: 139 focused recall cards and 949 clinical application cards and 305 exam-style MCQs (109 THERA and 196 AHAD).
+
+Includes 681 classmate Anki cards integrated into the existing THERA topic subdeck, preserving cloze practice and 25 embedded reference images. Peer-authored answers carry source labels and specific known conflicts are flagged; the remaining answers have not been independently verified. The 24 wound-slide MCQs and 6 short answers reference the existing diabetic-foot, arterial-disease and venous-ulcer presentations.
 
 ## Import on your Mac
 
@@ -15,7 +17,7 @@ The APKG is the easiest option. The UTF-8 TSV is an alternative: import into Bas
 
 Therapeutic goals, patient education, red flags, ranked differentials with reasons, HEENT, skin/wounds, seminar cases, organisms/coverage, adult-versus-child differences, pregnancy/allergy considerations, non-drug measures, drug/dose/duration, calculations, monitoring, MUMS recommendations, AHAD foundations and Module 5 Cardiology I.
 
-Answers retain references, reasoning and common errors. MUMS facts refer to the **2024 Anti-infective handbook checked October 16, 2026**. Seminar/product-specific material and other guidelines are labelled separately. Incomplete source prescriptions remain explicitly incomplete; no unknown infant FTU or conflicting isotretinoin regimen is guessed. No licensed MUMS handbook, textbook PDFs, browser notes or personal progress are bundled.
+Answers retain references, reasoning and common errors. Checked MUMS questions refer to the **2024 Anti-infective handbook checked October 16, 2026**. Classmate answers and their supplied reference-image excerpts are separately labelled. Seminar/product-specific material and other guidelines are labelled separately. Incomplete source prescriptions remain explicitly incomplete; no unknown infant FTU or conflicting isotretinoin regimen is guessed. No complete licensed handbook, textbook PDFs, browser notes or personal progress are bundled.
 
 AHAD midterm is entirely multiple choice. Open-recall cards are study exercises; its Exam-style MCQ subdeck matches the question format. THERA gives the diagnosis and emphasizes treatment selection and safe prescribing; 48 precise treatment MCQs follow that format. Twelve additional THERA organism-set questions are optional integrated recall, beyond the instructor’s organism-memorization requirements.
 
