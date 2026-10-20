@@ -18,3 +18,5 @@
 .mcq-case-context{margin:18px 0;padding:16px;background:var(--cream);border:1px solid var(--line);border-radius:9px;font-size:14px;overflow-wrap:anywhere}.mcq-case-context summary{cursor:pointer;font-weight:700;color:var(--green)}.mcq-case-context p{white-space:pre-line}
 
 .classmate-answer,.classmate-source{overflow-wrap:anywhere;min-width:0}.classmate-answer img,.recall-card h2 img{max-width:100%;height:auto}.classmate-answer table{display:block;max-width:100%;overflow-x:auto}.classmate-source details{margin:16px 0}.cloze{font-weight:700;color:var(--green)}
+
+.builder-modules{display:flex;flex-wrap:wrap;gap:12px;border:1px solid var(--line);border-radius:10px;padding:16px;margin:18px 0}.builder-modules legend{font-weight:600;padding:0 6px}.builder-modules label{display:flex;gap:9px;align-items:flex-start;flex:1 1 150px;font-size:14px}.builder-modules input{margin-top:4px}.practice-builder{margin-bottom:22px;min-width:0}.practice-builder .filters>*{min-width:0}.practice-builder select{max-width:100%}
