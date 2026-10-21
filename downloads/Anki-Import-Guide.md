@@ -25,3 +25,8 @@ Organism memorization is required by the supplied AHAD guidance; the supplied TH
 
 Anki import documentation: https://docs.ankiweb.net/importing/packaged-decks.html
 Study Grove: https://mirleparskas.github.io/study-grove/
+
+
+## October 20 seminar emphasis update
+
+The same 1,393 cards now include source-labelled seminar priority tags on matched curated THERA cards: `seminar::Wendy::explicit`, `seminar::Wendy::starred`, and `seminar::Wendy::inferred`. Priority explanations are on the answer side. These are study emphasis labels, not guaranteed exam questions. Peer-only cards remain identified as peer-authored; they are not promoted to verified instructor answers. Importing the APKG updates stable note IDs. The online THERA Exam guide contains the new 19-topic answered review, with MUMS 2024 rows and separately labelled reference comparisons.
